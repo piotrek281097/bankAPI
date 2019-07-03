@@ -25,7 +25,7 @@ public class AccountEndpoint {
 
     @GetMapping("accounts")
     public ResponseEntity<List<Account>> getAccounts() {
-        return new ResponseEntity<>(accountService.findAll(), HttpStatus.OK);
+        return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
     }
 
     @PostMapping("accounts/add")
@@ -36,7 +36,7 @@ public class AccountEndpoint {
 
 
     @PutMapping("accounts/{accountNumber}")
-    public ResponseEntity<?> updateAccount(@PathVariable String accountNumber, @RequestBody Account account) {
+    public ResponseEntity<Account> updateAccount(@PathVariable String accountNumber, @RequestBody Account account) {
 
         accountService.updateAccount(accountNumber, account);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -50,7 +50,7 @@ public class AccountEndpoint {
     }
 
     @GetMapping("accounts/{accountNumber}")
-    public ResponseEntity<Optional<Account>> findAccountByAccountNumber(@PathVariable String accountNumber, @RequestBody Account account) {
+    public ResponseEntity<Account> findAccountByAccountNumber(@PathVariable String accountNumber, @RequestBody Account account) {
 
         return new ResponseEntity<>(accountService.findAccountByAccountNumber(accountNumber), HttpStatus.OK);
     }

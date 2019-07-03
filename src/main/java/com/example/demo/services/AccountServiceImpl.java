@@ -29,10 +29,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void deleteAccountByNumber(String accountNumber) {
 
-        Optional<Account> optionalAccount = accountRepository.findAccountByAccountNumber(accountNumber);
+        Account account = accountRepository.findAccountByAccountNumber(accountNumber);
 
-        if (optionalAccount.isPresent()) {
-            accountRepository.delete(optionalAccount.get());
+        if (account != null) {
+            accountRepository.delete(account);
         }
         else {
             throw new AccountDoesNotExistException("Rachunek nie istnieje!");
@@ -43,15 +43,15 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void updateAccount(String accountNumber, Account account) {
 
-        Optional<Account> optionalAccount = accountRepository.findAccountByAccountNumber(accountNumber);
+        Account accountToSave = accountRepository.findAccountByAccountNumber(accountNumber);
 
-        if (optionalAccount.isPresent()) {
-            optionalAccount.get().setAccountNumber(account.getAccountNumber());
-            optionalAccount.get().setCurrency(account.getCurrency());
-            optionalAccount.get().setMoney(account.getMoney());
-            optionalAccount.get().setOwnerName(account.getOwnerName());
+        if (accountToSave != null ) {
+            accountToSave.setAccountNumber(account.getAccountNumber());
+            accountToSave.setCurrency(account.getCurrency());
+            accountToSave.setMoney(account.getMoney());
+            accountToSave.setOwnerName(account.getOwnerName());
 
-            addAccount(optionalAccount.get());
+            addAccount(accountToSave);
 
         }
         else {
@@ -60,16 +60,16 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<Account> findAll() {
+    public List<Account> getAllAccounts() {
         return accountRepository.findAll();
     }
 
     @Override
-    public Optional<Account> findAccountByAccountNumber(String accountNumber) {
-        Optional<Account> optionalAccount = accountRepository.findAccountByAccountNumber(accountNumber);
+    public Account findAccountByAccountNumber(String accountNumber) {
+        Account account = accountRepository.findAccountByAccountNumber(accountNumber);
 
-        if (optionalAccount.isPresent()) {
-            return optionalAccount;
+        if (account != null) {
+            return account;
         }
         else {
             throw new AccountDoesNotExistException("Rachunek nie istnieje!");
