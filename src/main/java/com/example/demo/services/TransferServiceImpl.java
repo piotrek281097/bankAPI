@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TransferServiceImpl implements TransferService {
@@ -78,16 +77,13 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public List<Transfer> getTransfersByAccountNumber(String accountNumber) {
+
         List<Transfer> transfersFrom = transferRepository.findByFirstAccountNumber(accountNumber);
         List<Transfer> transfersTo = transferRepository.findBySecondAccountNumber(accountNumber);
 
         List<Transfer> transfers = new ArrayList<>();
         transfers.addAll(transfersFrom);
         transfers.addAll(transfersTo);
-
-        if(transfers.size() == 0) {
-            throw new AccountDoesNotExistException("Nie ma przelewow dla tego konta");
-        }
 
         return transfers;
     }

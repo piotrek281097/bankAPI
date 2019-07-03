@@ -18,12 +18,12 @@ public class Account {
 
     @Size(min = 26, max = 26)
     private String accountNumber;
-    private double money;
+    private Double money;
     private String currency;
     private String ownerName;
 
 
-    Account(String accountNumber, double money, String currency, String ownerName)
+    Account(String accountNumber, Double money, String currency, String ownerName)
     {
         this.accountNumber = accountNumber;
         this.money = money;

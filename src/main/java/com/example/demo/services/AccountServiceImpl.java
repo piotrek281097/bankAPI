@@ -46,13 +46,18 @@ public class AccountServiceImpl implements AccountService {
         Account accountToSave = accountRepository.findAccountByAccountNumber(accountNumber);
 
         if (accountToSave != null ) {
-            accountToSave.setAccountNumber(account.getAccountNumber());
-            accountToSave.setCurrency(account.getCurrency());
-            accountToSave.setMoney(account.getMoney());
-            accountToSave.setOwnerName(account.getOwnerName());
+            if(account.getMoney() != null) {
+                accountToSave.setMoney(account.getMoney());
+            }
+            if(account.getCurrency() != null) {
+                accountToSave.setCurrency(account.getCurrency());
+            }
+            if(account.getOwnerName() != null) {
+                accountToSave.setOwnerName(account.getOwnerName());
+            }
 
             addAccount(accountToSave);
-
+            accountRepository.save(accountToSave);
         }
         else {
             throw new AccountDoesNotExistException("Rachunek nie istnieje!");

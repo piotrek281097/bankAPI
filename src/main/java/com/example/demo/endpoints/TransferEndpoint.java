@@ -16,13 +16,10 @@ import java.util.List;
 @RequestMapping("/api/")
 public class TransferEndpoint {
 
-
-    private AccountService accountService;
     private TransferService transferService;
 
     @Autowired
     public TransferEndpoint(AccountService accountService, TransferService transferService) {
-        this.accountService = accountService;
         this.transferService = transferService;
     }
 
