@@ -23,7 +23,7 @@ public class Account {
     private String ownerName;
 
 
-    Account(String accountNumber, Double money, String currency, String ownerName)
+    public Account(String accountNumber, Double money, String currency, String ownerName)
     {
         this.accountNumber = accountNumber;
         this.money = money;

@@ -6,6 +6,7 @@ import com.example.demo.entities.Transfer;
 import com.example.demo.exceptions.AccountDoesNotExistException;
 import com.example.demo.exceptions.ConnectionException;
 import com.example.demo.exceptions.CurrencyIsNotAvailableException;
+import com.example.demo.exceptions.NotEnoughMoneyToMakeTransferException;
 import com.example.demo.repositories.AccountRepository;
 import com.example.demo.repositories.TransferRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +43,7 @@ public class TransferServiceImpl implements TransferService {
             Account firstAccount = accountRepository.findAccountByAccountNumber(accountNumberFrom);
             Account secondAccount = accountRepository.findAccountByAccountNumber(accountNumberTo);
 
-            Double newMoneyAmountToFirstAccount = Double.valueOf(0), newMoneyAmountToSecondAccount = Double.valueOf(0);
+            Double newMoneyAmountToFirstAccount, newMoneyAmountToSecondAccount, moneyTransferAmountTo = 0.0;
 
             if(firstAccount == null) {
                 throw new AccountDoesNotExistException("Rachunek z ktorego mial byc przelew nie istnieje");
@@ -53,33 +54,33 @@ public class TransferServiceImpl implements TransferService {
             else {
                 if(firstAccount.getCurrency().equals(secondAccount.getCurrency())) {
                     newMoneyAmountToFirstAccount = firstAccount.getMoney() - valueOfTransfer;
-                    newMoneyAmountToSecondAccount = secondAccount.getMoney() + valueOfTransfer;
+
+                    moneyTransferAmountTo = valueOfTransfer;
                 }
                 else {
-                    Double moneyTransferAmountTo = convertCurrencies(firstAccount.getCurrency(), secondAccount.getCurrency(), valueOfTransfer );
+                    moneyTransferAmountTo = convertCurrencies(firstAccount.getCurrency(), secondAccount.getCurrency(), valueOfTransfer );
 
                     newMoneyAmountToFirstAccount = firstAccount.getMoney() - valueOfTransfer;
-                    newMoneyAmountToSecondAccount = secondAccount.getMoney() + moneyTransferAmountTo;
 
                     System.out.println("TRANSFER MONEY: " + moneyTransferAmountTo);
                 }
-
 
 
                 List<Account> updatedAccountsList = new ArrayList<>();
 
                 if (newMoneyAmountToFirstAccount > 0) {
                     firstAccount.setMoney(newMoneyAmountToFirstAccount);
-                    secondAccount.setMoney(newMoneyAmountToSecondAccount);
+                }
+                else {
+                    throw new NotEnoughMoneyToMakeTransferException("Za malo pieniedzy");
                 }
 
                 updatedAccountsList.add(firstAccount);
                 updatedAccountsList.add(secondAccount);
 
                 accountRepository.save(firstAccount);
-                accountRepository.save(secondAccount);
 
-                addTransfer(new Transfer(firstAccount.getAccountNumber(), secondAccount.getAccountNumber(), valueOfTransfer, secondAccount.getCurrency(),
+                addTransfer(new Transfer(firstAccount.getAccountNumber(), secondAccount.getAccountNumber(), moneyTransferAmountTo, secondAccount.getCurrency(),
                         LocalDateTime.now(), null, TransferStatus.OPENED));
 
                 return updatedAccountsList;
@@ -140,6 +141,10 @@ public class TransferServiceImpl implements TransferService {
 
         for(Transfer transfer : transfers) {
             if(transfer.getTransferStatus().equals(TransferStatus.OPENED)) {
+                Account secondAccount = accountRepository.findAccountByAccountNumber(transfer.getSecondAccountNumber());
+                secondAccount.setMoney(secondAccount.getMoney() + transfer.getMoney());
+                accountRepository.save(secondAccount);
+
                 transfer.setTransferStatus(TransferStatus.FINISHED);
                 transfer.setDataFinishTransfer(LocalDateTime.now());
                 transferRepository.save(transfer);

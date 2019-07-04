@@ -15,7 +15,7 @@ public class TransferChangeStatusTask {
         this.transferService = transferService;
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 60000)
     public void reportCurrentTime() {
         transferService.finishTransfers();
     }
