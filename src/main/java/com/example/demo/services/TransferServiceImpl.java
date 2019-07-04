@@ -26,13 +26,11 @@ public class TransferServiceImpl implements TransferService {
 
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
-    private ObjectMapper objectMapper;
 
     @Autowired
-    public TransferServiceImpl(AccountRepository accountRepository, TransferRepository transferRepository, ObjectMapper objectMapper) {
+    public TransferServiceImpl(AccountRepository accountRepository, TransferRepository transferRepository) {
         this.accountRepository = accountRepository;
         this.transferRepository = transferRepository;
-        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -43,7 +41,7 @@ public class TransferServiceImpl implements TransferService {
             Account firstAccount = accountRepository.findAccountByAccountNumber(accountNumberFrom);
             Account secondAccount = accountRepository.findAccountByAccountNumber(accountNumberTo);
 
-            Double newMoneyAmountToFirstAccount, newMoneyAmountToSecondAccount, moneyTransferAmountTo = 0.0;
+            Double newMoneyAmountToFirstAccount, moneyTransferAmountTo;
 
             if(firstAccount == null) {
                 throw new AccountDoesNotExistException("Rachunek z ktorego mial byc przelew nie istnieje");
