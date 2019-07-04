@@ -1,10 +1,12 @@
 package com.example.demo.entities;
 
+import com.example.demo.TransferStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -22,16 +24,18 @@ public class Transfer {
     private String secondAccountNumber;
     private double money;
     private String currency;
+    private LocalDateTime dataOpenTransfer;
+    private LocalDateTime dataFinishTransfer;
+    private TransferStatus transferStatus;
 
 
-
-    public Transfer(String firstAccountNumber, String secondAccountNumber, Double money) {
+    public Transfer(String firstAccountNumber, String secondAccountNumber, Double money, String currency, LocalDateTime dataOpenTransfer, LocalDateTime dataFinishTransfer, TransferStatus transferStatus) {
         this.firstAccountNumber = firstAccountNumber;
         this.secondAccountNumber = secondAccountNumber;
         this.money = money;
+        this.currency = currency;
+        this.dataOpenTransfer = dataOpenTransfer;
+        this.dataFinishTransfer = dataFinishTransfer;
+        this.transferStatus = transferStatus;
     }
-
-
-
-
 }

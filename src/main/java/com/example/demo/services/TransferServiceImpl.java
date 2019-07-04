@@ -1,5 +1,6 @@
 package com.example.demo.services;
 import com.example.demo.DTOs.CurrencyDto;
+import com.example.demo.TransferStatus;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.Transfer;
 import com.example.demo.exceptions.AccountDoesNotExistException;
@@ -8,18 +9,13 @@ import com.example.demo.exceptions.CurrencyIsNotAvailableException;
 import com.example.demo.repositories.AccountRepository;
 import com.example.demo.repositories.TransferRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -83,7 +79,8 @@ public class TransferServiceImpl implements TransferService {
                 accountRepository.save(firstAccount);
                 accountRepository.save(secondAccount);
 
-                addTransfer(new Transfer(firstAccount.getAccountNumber(), secondAccount.getAccountNumber(), valueOfTransfer));
+                addTransfer(new Transfer(firstAccount.getAccountNumber(), secondAccount.getAccountNumber(), valueOfTransfer, secondAccount.getCurrency(),
+                        LocalDateTime.now(), null, TransferStatus.OPENED));
 
                 return updatedAccountsList;
             }
@@ -134,6 +131,19 @@ public class TransferServiceImpl implements TransferService {
         }
         catch (ResourceAccessException ex) {
            throw new ConnectionException("Blad w polaczeniu z API");
+        }
+    }
+
+    @Override
+    public void finishTransfers() {
+        List<Transfer> transfers = getAllTransfers();
+
+        for(Transfer transfer : transfers) {
+            if(transfer.getTransferStatus().equals(TransferStatus.OPENED)) {
+                transfer.setTransferStatus(TransferStatus.FINISHED);
+                transfer.setDataFinishTransfer(LocalDateTime.now());
+                transferRepository.save(transfer);
+            }
         }
     }
 
