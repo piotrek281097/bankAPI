@@ -1,6 +1,6 @@
 package com.example.demo.services;
 import com.example.demo.DTOs.CurrencyDto;
-import com.example.demo.TransferStatus;
+import com.example.demo.enums.TransferStatus;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.Transfer;
 import com.example.demo.exceptions.AccountDoesNotExistException;

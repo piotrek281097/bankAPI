@@ -1,6 +1,6 @@
 package com.example.demo.entities;
 
-import com.example.demo.TransferStatus;
+import com.example.demo.enums.TransferStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
