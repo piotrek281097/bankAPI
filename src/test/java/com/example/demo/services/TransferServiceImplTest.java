@@ -28,7 +28,6 @@ public class TransferServiceImplTest {
 
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
-    private ObjectMapper objectMapper;
 
 
     @Before
