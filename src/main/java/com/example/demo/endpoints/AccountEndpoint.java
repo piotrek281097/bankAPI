@@ -34,19 +34,19 @@ public class AccountEndpoint {
     }
 
 
-    @PutMapping("accounts/{accountNumber}")
+    @PutMapping("accounts/update/{accountNumber}")
     public ResponseEntity<Account> updateAccount(@PathVariable String accountNumber, @RequestBody Account account) {
         accountService.updateAccount(accountNumber, account);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("accounts/{accountNumber}")
+    @DeleteMapping("accounts/delete/{accountNumber}")
     public ResponseEntity<?> deleteAccountByNumber(@PathVariable String accountNumber) {
         accountService.deleteAccountByNumber(accountNumber);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("accounts/{accountNumber}")
+    @GetMapping("accounts/findByNumber/{accountNumber}")
     public ResponseEntity<Account> findAccountByAccountNumber(@PathVariable String accountNumber, @RequestBody Account account) {
         return new ResponseEntity<>(accountService.findAccountByAccountNumber(accountNumber), HttpStatus.OK);
     }

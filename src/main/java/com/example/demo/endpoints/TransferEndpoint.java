@@ -31,7 +31,7 @@ public class TransferEndpoint {
         return new ResponseEntity<>(transferService.makeTransfer(accountNumberFrom, accountNumberTo, money), HttpStatus.OK);
     }
 
-    @GetMapping("transfers/{accountNumber}")
+    @GetMapping("transfers/findByNumber/{accountNumber}")
     public ResponseEntity<?> getTransfersByAccountNumber(@PathVariable String accountNumber) {
         return new ResponseEntity<>(transferService.getTransfersByAccountNumber(accountNumber), HttpStatus.OK);
     }
