@@ -5,3 +5,10 @@ sudo: true
 
 before_install:
   - chmod +x mvnw
+
+script:
+  - mvn clean install -U
+  - mvn validate
+stages:
+  - compile
+  - test
