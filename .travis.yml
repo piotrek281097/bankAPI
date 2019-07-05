@@ -10,3 +10,19 @@ before_install:
 stages:
   - compile
   - test
+
+cache:
+  directories:
+    - .autoconf
+    - $HOME/.m2
+before_script:
+  - bundle exec rake db:create
+  - bundle exec rake db:migrate
+  - bundle exec rake assets:precompile
+deploy:
+  provider: heroku
+  api_key:
+    secure: c212d231-acb8-4eae-b130-ff5141f575a2
+  app: bankrestapicomarch
+  on:
+    repo: piotrek281097/bankAPI
