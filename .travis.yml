@@ -10,3 +10,22 @@ before_install:
 stages:
   - compile
   - test
+
+cache:
+  directories:
+    - .autoconf
+    - $HOME/.m2
+
+spring:
+  datasource:
+    url: ${jdbc:mysql://localhost:3306/accounts_database?useSSL=false&serverTimezone=UTC}
+    username: ${root}
+    password: ${root}
+
+deploy:
+  provider: heroku
+  api_key:
+    secure: c212d231-acb8-4eae-b130-ff5141f575a2
+  app: bankrestapicomarch
+  on:
+    repo: piotrek281097/bankAPI
