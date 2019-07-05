@@ -47,7 +47,7 @@ public class AccountEndpoint {
     }
 
     @GetMapping("accounts/findByNumber/{accountNumber}")
-    public ResponseEntity<Account> findAccountByAccountNumber(@PathVariable String accountNumber, @RequestBody Account account) {
+    public ResponseEntity<Account> findAccountByAccountNumber(@PathVariable String accountNumber) {
         return new ResponseEntity<>(accountService.findAccountByAccountNumber(accountNumber), HttpStatus.OK);
     }
 
