@@ -103,7 +103,7 @@ public class TransferServiceImplTest {
 
         accountService.updateAccount(account.getAccountNumber(), updatedAccount);
 
-        assertThat(account.getMoney(), is(100.00));
+        assertThat(account.getMoney(), is(10.00));
     }
 
     @Test
