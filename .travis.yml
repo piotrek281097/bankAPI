@@ -1,14 +1,4 @@
 language: java
 jdk: oraclejdk8
+install: true
 sudo: true
-script:
-  -gradle assemble
-  -gradle build
-
-install:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-
-cache:
-  directories:
-    - .autoconf
-    - $HOME/.m2
