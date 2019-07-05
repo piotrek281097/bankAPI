@@ -15,10 +15,13 @@ cache:
   directories:
     - .autoconf
     - $HOME/.m2
-before_script:
-  - bundle exec rake db:create
-  - bundle exec rake db:migrate
-  - bundle exec rake assets:precompile
+
+spring:
+  datasource:
+    url: ${jdbc:mysql://localhost:3306/accounts_database?useSSL=false&serverTimezone=UTC}
+    username: ${root}
+    password: ${root}
+
 deploy:
   provider: heroku
   api_key:
