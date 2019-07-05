@@ -9,7 +9,6 @@ import com.example.demo.exceptions.CurrencyIsNotAvailableException;
 import com.example.demo.exceptions.NotEnoughMoneyToMakeTransferException;
 import com.example.demo.repositories.AccountRepository;
 import com.example.demo.repositories.TransferRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,6 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public List<Account> makeTransfer(String accountNumberFrom, String accountNumberTo, Double valueOfTransfer) {
-
         if(!accountNumberFrom.equals(accountNumberTo)) {
 
             Account firstAccount = accountRepository.findAccountByAccountNumber(accountNumberFrom);
@@ -52,17 +50,12 @@ public class TransferServiceImpl implements TransferService {
             else {
                 if(firstAccount.getCurrency().equals(secondAccount.getCurrency())) {
                     newMoneyAmountToFirstAccount = firstAccount.getMoney() - valueOfTransfer;
-
                     moneyTransferAmountTo = valueOfTransfer;
                 }
                 else {
                     moneyTransferAmountTo = convertCurrencies(firstAccount.getCurrency(), secondAccount.getCurrency(), valueOfTransfer );
-
                     newMoneyAmountToFirstAccount = firstAccount.getMoney() - valueOfTransfer;
-
-                    System.out.println("TRANSFER MONEY: " + moneyTransferAmountTo);
                 }
-
 
                 List<Account> updatedAccountsList = new ArrayList<>();
 
@@ -100,7 +93,6 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public List<Transfer> getTransfersByAccountNumber(String accountNumber) {
-
         List<Transfer> transfersFrom = transferRepository.findByFirstAccountNumber(accountNumber);
         List<Transfer> transfersTo = transferRepository.findBySecondAccountNumber(accountNumber);
 
@@ -112,18 +104,14 @@ public class TransferServiceImpl implements TransferService {
     }
 
 
-    public Double convertCurrencies(String currency1, String currency2, Double valueOfTransfer) {
-
+    private Double convertCurrencies(String currency1, String currency2, Double valueOfTransfer) {
         try {
-
             RestTemplate restTemplate = new RestTemplate();
             String url = "https://api.exchangeratesapi.io/latest?base=" + currency1;
             ResponseEntity<CurrencyDto> response = restTemplate.getForEntity(url, CurrencyDto.class);
             CurrencyDto currencyDto = response.getBody();
 
-            double result = valueOfTransfer * currencyDto.getRates().get(currency2);
-
-            return result;
+            return valueOfTransfer * currencyDto.getRates().get(currency2);
         }
         catch (NullPointerException ex) {
             throw new CurrencyIsNotAvailableException("Blad w konwersji walut");
@@ -137,6 +125,19 @@ public class TransferServiceImpl implements TransferService {
     public void finishTransfers() {
         List<Transfer> transfers = getAllTransfers();
 
+        transfers.stream()
+                .filter(x -> x.getTransferStatus() == TransferStatus.OPENED)
+                .forEach(x -> {
+                    Account secondAccount = accountRepository.findAccountByAccountNumber(x.getSecondAccountNumber());
+                    secondAccount.setMoney(secondAccount.getMoney() + x.getMoney());
+                    accountRepository.save(secondAccount);
+
+                    x.setTransferStatus(TransferStatus.FINISHED);
+                    x.setDataFinishTransfer(LocalDateTime.now());
+                    transferRepository.save(x);
+                });
+        }
+        /*
         for(Transfer transfer : transfers) {
             if(transfer.getTransferStatus().equals(TransferStatus.OPENED)) {
                 Account secondAccount = accountRepository.findAccountByAccountNumber(transfer.getSecondAccountNumber());
@@ -148,6 +149,5 @@ public class TransferServiceImpl implements TransferService {
                 transferRepository.save(transfer);
             }
         }
-    }
-
+         */
 }

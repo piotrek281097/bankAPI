@@ -1,8 +1,6 @@
 package com.example.demo.endpoints;
 
-import com.example.demo.entities.Account;
 import com.example.demo.entities.Transfer;
-import com.example.demo.services.AccountService;
 import com.example.demo.services.TransferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +17,7 @@ public class TransferEndpoint {
     private TransferService transferService;
 
     @Autowired
-    public TransferEndpoint(AccountService accountService, TransferService transferService) {
+    public TransferEndpoint(TransferService transferService) {
         this.transferService = transferService;
     }
 
@@ -30,13 +28,11 @@ public class TransferEndpoint {
 
     @PutMapping("accounts/transfer/{accountNumberFrom}/{accountNumberTo}/{money}")
     public ResponseEntity<?> makeTransfer(@PathVariable String accountNumberFrom, @PathVariable String accountNumberTo, @PathVariable Double money) {
-
         return new ResponseEntity<>(transferService.makeTransfer(accountNumberFrom, accountNumberTo, money), HttpStatus.OK);
     }
 
     @GetMapping("transfers/{accountNumber}")
     public ResponseEntity<?> getTransfersByAccountNumber(@PathVariable String accountNumber) {
-
         return new ResponseEntity<>(transferService.getTransfersByAccountNumber(accountNumber), HttpStatus.OK);
     }
 

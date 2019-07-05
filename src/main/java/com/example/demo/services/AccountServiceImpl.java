@@ -5,14 +5,10 @@ import com.example.demo.exceptions.AccountDoesNotExistException;
 import com.example.demo.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-
 
     private AccountRepository accountRepository;
 
@@ -28,7 +24,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void deleteAccountByNumber(String accountNumber) {
-
         Account account = accountRepository.findAccountByAccountNumber(accountNumber);
 
         if (account != null) {
@@ -42,7 +37,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void updateAccount(String accountNumber, Account account) {
-
         Account accountToSave = accountRepository.findAccountByAccountNumber(accountNumber);
 
         if (accountToSave != null ) {

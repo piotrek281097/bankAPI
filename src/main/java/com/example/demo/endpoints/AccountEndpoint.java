@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -37,21 +36,18 @@ public class AccountEndpoint {
 
     @PutMapping("accounts/{accountNumber}")
     public ResponseEntity<Account> updateAccount(@PathVariable String accountNumber, @RequestBody Account account) {
-
         accountService.updateAccount(accountNumber, account);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("accounts/{accountNumber}")
     public ResponseEntity<?> deleteAccountByNumber(@PathVariable String accountNumber) {
-
         accountService.deleteAccountByNumber(accountNumber);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("accounts/{accountNumber}")
     public ResponseEntity<Account> findAccountByAccountNumber(@PathVariable String accountNumber, @RequestBody Account account) {
-
         return new ResponseEntity<>(accountService.findAccountByAccountNumber(accountNumber), HttpStatus.OK);
     }
 
