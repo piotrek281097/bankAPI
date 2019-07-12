@@ -38,4 +38,10 @@ public class ErrorHandling {
         response.sendError(HttpStatus.CONFLICT.value(), exc.getMessage());
     }
 
+    @ExceptionHandler(AccountWithThisNumberAlreadyExistsException.class)
+    public void AccountWithThisNumberAlreadyExistsException(AccountWithThisNumberAlreadyExistsException exc, HttpServletResponse response) throws IOException {
+        LOGGER.error(exc.getMessage());
+        response.sendError(HttpStatus.CONFLICT.value(), exc.getMessage());
+    }
+
 }

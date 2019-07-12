@@ -2,6 +2,7 @@ package com.example.demo.entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -17,6 +18,7 @@ public class Account {
     private long accountId;
 
     @Size(min = 26, max = 26)
+    @Column(unique = true)
     private String accountNumber;
     private Double money;
     private String currency;
