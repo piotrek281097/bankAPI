@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +37,7 @@ public class TransferServiceImpl implements TransferService {
     public List<Account> makeTransfer(String accountNumberFrom, String accountNumberTo, Double valueOfTransfer) {
         if(!accountNumberFrom.equals(accountNumberTo)) {
 
+            valueOfTransfer = roundValue(valueOfTransfer);
             Account firstAccount = accountRepository.findAccountByAccountNumber(accountNumberFrom);
             Account secondAccount = accountRepository.findAccountByAccountNumber(accountNumberTo);
 
@@ -111,7 +113,7 @@ public class TransferServiceImpl implements TransferService {
             ResponseEntity<CurrencyDto> response = restTemplate.getForEntity(url, CurrencyDto.class);
             CurrencyDto currencyDto = response.getBody();
 
-            return valueOfTransfer * currencyDto.getRates().get(currency2);
+            return roundValue(valueOfTransfer * currencyDto.getRates().get(currency2));
         }
         catch (NullPointerException ex) {
             throw new CurrencyIsNotAvailableException("Blad w konwersji walut");
@@ -129,7 +131,7 @@ public class TransferServiceImpl implements TransferService {
                 .filter(x -> x.getTransferStatus() == TransferStatus.OPENED)
                 .forEach(x -> {
                     Account secondAccount = accountRepository.findAccountByAccountNumber(x.getSecondAccountNumber());
-                    secondAccount.setMoney(secondAccount.getMoney() + x.getMoney());
+                    secondAccount.setMoney(roundValue(secondAccount.getMoney() + x.getMoney()));
                     accountRepository.save(secondAccount);
 
                     x.setTransferStatus(TransferStatus.FINISHED);
@@ -150,4 +152,11 @@ public class TransferServiceImpl implements TransferService {
             }
         }
          */
+
+    public static double roundValue(Double value) {
+        String newValue = new DecimalFormat("##.##").format(value);
+        newValue = newValue.replace(",", ".");
+
+        return Double.parseDouble(newValue);
+    }
 }

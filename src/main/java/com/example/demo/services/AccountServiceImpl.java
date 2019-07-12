@@ -14,6 +14,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 @Service
@@ -47,6 +48,7 @@ public class AccountServiceImpl implements AccountService {
                 throw new CurrencyIsNotAvailableException("Blad z waluta");
             }
 
+            account.setMoney(roundValue(account.getMoney()));
             accountRepository.save(account);
         }
 
@@ -72,7 +74,7 @@ public class AccountServiceImpl implements AccountService {
 
         if (accountToSave != null ) {
             if(account.getMoney() != null) {
-                accountToSave.setMoney(account.getMoney());
+                accountToSave.setMoney(roundValue(account.getMoney()));
             }
             if(account.getCurrency() != null) {
                 accountToSave.setCurrency(account.getCurrency());
@@ -104,5 +106,12 @@ public class AccountServiceImpl implements AccountService {
         else {
             throw new AccountDoesNotExistException("Rachunek nie istnieje!");
         }
+    }
+
+    public static double roundValue(Double value) {
+        String newValue = new DecimalFormat("##.##").format(value);
+        newValue = newValue.replace(",", ".");
+
+        return Double.parseDouble(newValue);
     }
 }
