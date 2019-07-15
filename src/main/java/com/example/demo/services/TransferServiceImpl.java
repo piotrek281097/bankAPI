@@ -105,6 +105,20 @@ public class TransferServiceImpl implements TransferService {
         return transfers;
     }
 
+    @Override
+    public List<Transfer> getTransfersOutByAccountNumber(String accountNumber) {
+        List<Transfer> transfers = transferRepository.findByFirstAccountNumber(accountNumber);
+
+        return transfers;
+    }
+
+    @Override
+    public List<Transfer> getTransfersInByAccountNumber(String accountNumber) {
+        List<Transfer> transfers = transferRepository.findBySecondAccountNumber(accountNumber);
+
+        return transfers;
+    }
+
 
     private Double convertCurrencies(String currency1, String currency2, Double valueOfTransfer) {
         try {
@@ -138,22 +152,9 @@ public class TransferServiceImpl implements TransferService {
                     x.setDataFinishTransfer(LocalDateTime.now());
                     transferRepository.save(x);
                 });
-        }
-        /*
-        for(Transfer transfer : transfers) {
-            if(transfer.getTransferStatus().equals(TransferStatus.OPENED)) {
-                Account secondAccount = accountRepository.findAccountByAccountNumber(transfer.getSecondAccountNumber());
-                secondAccount.setMoney(secondAccount.getMoney() + transfer.getMoney());
-                accountRepository.save(secondAccount);
+    }
 
-                transfer.setTransferStatus(TransferStatus.FINISHED);
-                transfer.setDataFinishTransfer(LocalDateTime.now());
-                transferRepository.save(transfer);
-            }
-        }
-         */
-
-    public static double roundValue(Double value) {
+    private static double roundValue(Double value) {
         String newValue = new DecimalFormat("##.##").format(value);
         newValue = newValue.replace(",", ".");
 

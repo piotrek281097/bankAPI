@@ -14,4 +14,6 @@ public interface TransferService {
     void addTransfer(Transfer transfer);
     List<Transfer> getTransfersByAccountNumber(String accountNumber);
     void finishTransfers();
+    List<Transfer> getTransfersOutByAccountNumber(String accountNumber);
+    List<Transfer> getTransfersInByAccountNumber(String accountNumber);
 }
