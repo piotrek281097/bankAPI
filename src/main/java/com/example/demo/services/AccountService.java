@@ -11,4 +11,5 @@ public interface AccountService {
     List<Account> getAllAccounts();
     Account findAccountByAccountNumber(String accountNumber);
     void deleteAccountByNumber(String accountNumber);
+    List<Account> findAccountByOwnerName(String ownerName);
 }

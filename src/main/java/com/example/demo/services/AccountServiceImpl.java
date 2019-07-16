@@ -108,6 +108,18 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    @Override
+    public List<Account> findAccountByOwnerName(String accountNumber) {
+        List<Account> accountsFoundByName = accountRepository.findAccountsByOwnerName(accountNumber);
+
+        if (accountsFoundByName.size() != 0) {
+            return accountsFoundByName;
+        }
+        else {
+            throw new AccountDoesNotExistException("Rachunek o takim nazwisku nie istnieje!");
+        }
+    }
+
     public static double roundValue(Double value) {
         String newValue = new DecimalFormat("##.##").format(value);
         newValue = newValue.replace(",", ".");

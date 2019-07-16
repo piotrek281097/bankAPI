@@ -51,4 +51,9 @@ public class AccountEndpoint {
         return new ResponseEntity<>(accountService.findAccountByAccountNumber(accountNumber), HttpStatus.OK);
     }
 
+    @GetMapping("accounts/findByOwnerName/{ownerName}")
+    public ResponseEntity<List<Account>> findAccountByOwnerName(@PathVariable String ownerName) {
+        return new ResponseEntity<>(accountService.findAccountByOwnerName(ownerName), HttpStatus.OK);
+    }
+
 }
