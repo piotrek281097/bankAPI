@@ -44,4 +44,10 @@ public class ErrorHandling {
         response.sendError(HttpStatus.CONFLICT.value(), exc.getMessage());
     }
 
+    @ExceptionHandler(NotEnoughMoneyToMakeTransferException.class)
+    public void TransferCantBeCanceledException(TransferCantBeCanceledException exc, HttpServletResponse response) throws IOException {
+        LOGGER.error(exc.getMessage());
+        response.sendError(HttpStatus.CONFLICT.value(), exc.getMessage());
+    }
+
 }

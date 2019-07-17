@@ -16,7 +16,7 @@ public class Transfer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long accountId;
+    private long transferId;
 
     @Size(min = 26, max = 26)
     private String firstAccountNumber;

@@ -3,10 +3,7 @@ import com.example.demo.DTOs.CurrencyDto;
 import com.example.demo.enums.TransferStatus;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.Transfer;
-import com.example.demo.exceptions.AccountDoesNotExistException;
-import com.example.demo.exceptions.ConnectionException;
-import com.example.demo.exceptions.CurrencyIsNotAvailableException;
-import com.example.demo.exceptions.NotEnoughMoneyToMakeTransferException;
+import com.example.demo.exceptions.*;
 import com.example.demo.repositories.AccountRepository;
 import com.example.demo.repositories.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,5 +156,19 @@ public class TransferServiceImpl implements TransferService {
         newValue = newValue.replace(",", ".");
 
         return Double.parseDouble(newValue);
+    }
+
+   @Override
+    public Transfer cancelTransfer(long transferId) {
+        Transfer canceledTransfer = transferRepository.findByTransferId(transferId);
+        if(canceledTransfer.getTransferStatus() == TransferStatus.OPENED) {
+            canceledTransfer.setTransferStatus(TransferStatus.CANCELED);
+            transferRepository.save(canceledTransfer);
+        }
+        else if(canceledTransfer.getTransferStatus() == TransferStatus.FINISHED) {
+            throw new TransferCantBeCanceledException("Transfer już zakończony, nie można anulować");
+        }
+
+        return canceledTransfer;
     }
 }
