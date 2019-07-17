@@ -41,10 +41,10 @@ public class TransferServiceImpl implements TransferService {
             Double newMoneyAmountToFirstAccount, moneyTransferAmountTo;
 
             if(firstAccount == null) {
-                throw new AccountDoesNotExistException("Rachunek z ktorego mial byc przelew nie istnieje");
+                throw new AccountDoesNotExistException("Rachunek z ktorego mial byc przelew nie istnieje 1 " + accountNumberFrom);
             }
             else if(secondAccount == null) {
-                throw new AccountDoesNotExistException("Rachunek na ktory mial byc przelew nie istnieje");
+                throw new AccountDoesNotExistException("Rachunek na ktory mial byc przelew nie istnieje 2 " + accountNumberTo);
             }
             else {
                 if(firstAccount.getCurrency().equals(secondAccount.getCurrency())) {
@@ -70,8 +70,8 @@ public class TransferServiceImpl implements TransferService {
 
                 accountRepository.save(firstAccount);
 
-                addTransfer(new Transfer(firstAccount.getAccountNumber(), secondAccount.getAccountNumber(), moneyTransferAmountTo, secondAccount.getCurrency(),
-                        LocalDateTime.now(), null, TransferStatus.OPENED));
+                addTransfer(new Transfer(firstAccount.getAccountId(), secondAccount.getAccountId(),firstAccount.getAccountNumber(), secondAccount.getAccountNumber(),
+                        valueOfTransfer, moneyTransferAmountTo, secondAccount.getCurrency(), LocalDateTime.now(), null, TransferStatus.OPENED));
 
                 return updatedAccountsList;
             }
@@ -91,9 +91,9 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public List<Transfer> getTransfersByAccountNumber(String accountNumber) {
-        List<Transfer> transfersFrom = transferRepository.findByFirstAccountNumber(accountNumber);
-        List<Transfer> transfersTo = transferRepository.findBySecondAccountNumber(accountNumber);
+    public List<Transfer> getTransfersByAccountId(long accountId) {
+        List<Transfer> transfersFrom = transferRepository.findByFirstAccountId(accountId);
+        List<Transfer> transfersTo = transferRepository.findBySecondAccountId(accountId);
 
         List<Transfer> transfers = new ArrayList<>();
         transfers.addAll(transfersFrom);
@@ -103,19 +103,18 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public List<Transfer> getTransfersOutByAccountNumber(String accountNumber) {
-        List<Transfer> transfers = transferRepository.findByFirstAccountNumber(accountNumber);
+    public List<Transfer> getTransfersOutByAccountId(long accountId) {
+        List<Transfer> transfers = transferRepository.findByFirstAccountId(accountId);
 
         return transfers;
     }
 
     @Override
-    public List<Transfer> getTransfersInByAccountNumber(String accountNumber) {
-        List<Transfer> transfers = transferRepository.findBySecondAccountNumber(accountNumber);
+    public List<Transfer> getTransfersInByAccountId(long accountId) {
+        List<Transfer> transfers = transferRepository.findBySecondAccountId(accountId);
 
         return transfers;
     }
-
 
     private Double convertCurrencies(String currency1, String currency2, Double valueOfTransfer) {
         try {
@@ -142,12 +141,18 @@ public class TransferServiceImpl implements TransferService {
                 .filter(x -> x.getTransferStatus() == TransferStatus.OPENED)
                 .forEach(x -> {
                     Account secondAccount = accountRepository.findAccountByAccountNumber(x.getSecondAccountNumber());
-                    secondAccount.setMoney(roundValue(secondAccount.getMoney() + x.getMoney()));
-                    accountRepository.save(secondAccount);
+                    if(secondAccount != null) {
+                        secondAccount.setMoney(roundValue(secondAccount.getMoney() + x.getMoney()));
+                        accountRepository.save(secondAccount);
 
-                    x.setTransferStatus(TransferStatus.FINISHED);
-                    x.setDataFinishTransfer(LocalDateTime.now());
-                    transferRepository.save(x);
+                        x.setTransferStatus(TransferStatus.FINISHED);
+                        x.setDataFinishTransfer(LocalDateTime.now());
+                        transferRepository.save(x);
+                    }
+                    else {
+                        cancelTransfer(x.getTransferId());
+                        throw new AccountAlreadyDeletedException("Konto zostało usunięte! Nie można dokonać zaplanowanych czynności");
+                    }
                 });
     }
 
@@ -164,6 +169,10 @@ public class TransferServiceImpl implements TransferService {
         if(canceledTransfer.getTransferStatus() == TransferStatus.OPENED) {
             canceledTransfer.setTransferStatus(TransferStatus.CANCELED);
             transferRepository.save(canceledTransfer);
+
+            Account updatedAccountFrom = accountRepository.findAccountByAccountNumber(canceledTransfer.getFirstAccountNumber());
+            updatedAccountFrom.setMoney(updatedAccountFrom.getMoney() + canceledTransfer.getMoneyBeforeConverting());
+            accountRepository.save(updatedAccountFrom);
         }
         else if(canceledTransfer.getTransferStatus() == TransferStatus.FINISHED) {
             throw new TransferCantBeCanceledException("Transfer już zakończony, nie można anulować");

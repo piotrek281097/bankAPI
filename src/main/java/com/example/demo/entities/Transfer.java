@@ -18,10 +18,13 @@ public class Transfer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long transferId;
 
+    private long firstAccountId;
+    private long secondAccountId;
     @Size(min = 26, max = 26)
     private String firstAccountNumber;
     @Size(min = 26, max = 26)
     private String secondAccountNumber;
+    private double moneyBeforeConverting;
     private double money;
     private String currency;
     private LocalDateTime dataOpenTransfer;
@@ -29,9 +32,12 @@ public class Transfer {
     private TransferStatus transferStatus;
 
 
-    public Transfer(String firstAccountNumber, String secondAccountNumber, Double money, String currency, LocalDateTime dataOpenTransfer, LocalDateTime dataFinishTransfer, TransferStatus transferStatus) {
+    public Transfer(long firstAccountId, long secondAccountId, String firstAccountNumber, String secondAccountNumber, Double moneyBeforeConverting, Double money, String currency, LocalDateTime dataOpenTransfer, LocalDateTime dataFinishTransfer, TransferStatus transferStatus) {
+        this.firstAccountId = firstAccountId;
+        this.secondAccountId = secondAccountId;
         this.firstAccountNumber = firstAccountNumber;
         this.secondAccountNumber = secondAccountNumber;
+        this.moneyBeforeConverting = moneyBeforeConverting;
         this.money = money;
         this.currency = currency;
         this.dataOpenTransfer = dataOpenTransfer;

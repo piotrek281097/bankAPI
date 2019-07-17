@@ -56,8 +56,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void deleteAccountByNumber(String accountNumber) {
-        Account account = accountRepository.findAccountByAccountNumber(accountNumber);
+    public void deleteAccountById(long accountId) {
+        Account account = accountRepository.findAccountByAccountId(accountId);
 
         if (account != null) {
             accountRepository.delete(account);
@@ -69,8 +69,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void updateAccount(String accountNumber, Account account) {
-        Account accountToSave = accountRepository.findAccountByAccountNumber(accountNumber);
+    public void updateAccount(long accountId, Account account) {
+        Account accountToSave = accountRepository.findAccountByAccountId(accountId);
 
         if (accountToSave != null ) {
             if(account.getMoney() != null) {
@@ -99,6 +99,18 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account findAccountByAccountNumber(String accountNumber) {
         Account account = accountRepository.findAccountByAccountNumber(accountNumber);
+
+        if (account != null) {
+            return account;
+        }
+        else {
+            throw new AccountDoesNotExistException("Rachunek nie istnieje!");
+        }
+    }
+
+    @Override
+    public Account findAccountByAccountId(long accountId) {
+        Account account = accountRepository.findAccountByAccountId(accountId);
 
         if (account != null) {
             return account;

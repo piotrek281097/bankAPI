@@ -34,21 +34,26 @@ public class AccountEndpoint {
     }
 
 
-    @PutMapping("accounts/update/{accountNumber}")
-    public ResponseEntity<Account> updateAccount(@PathVariable String accountNumber, @RequestBody Account account) {
-        accountService.updateAccount(accountNumber, account);
+    @PutMapping("accounts/update/{accountId}")
+    public ResponseEntity<Account> updateAccount(@PathVariable long accountId, @RequestBody Account account) {
+        accountService.updateAccount(accountId, account);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("accounts/delete/{accountNumber}")
-    public ResponseEntity<?> deleteAccountByNumber(@PathVariable String accountNumber) {
-        accountService.deleteAccountByNumber(accountNumber);
+    @DeleteMapping("accounts/delete/{accountId}")
+    public ResponseEntity<?> deleteAccountByAccountId(@PathVariable long accountId) {
+        accountService.deleteAccountById(accountId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("accounts/findByNumber/{accountNumber}")
     public ResponseEntity<Account> findAccountByAccountNumber(@PathVariable String accountNumber) {
         return new ResponseEntity<>(accountService.findAccountByAccountNumber(accountNumber), HttpStatus.OK);
+    }
+
+    @GetMapping("accounts/findAccountByAccountId/{accountId}")
+    public ResponseEntity<Account> findAccountByAccountNumber(@PathVariable long accountId) {
+        return new ResponseEntity<>(accountService.findAccountByAccountId(accountId), HttpStatus.OK);
     }
 
     @GetMapping("accounts/findByOwnerName/{ownerName}")

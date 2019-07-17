@@ -99,9 +99,9 @@ public class TransferServiceImplTest {
 
     @Test
     public void testShouldReturnThatUpdateWorksCorrectly() {
-        when(accountRepository.findAccountByAccountNumber(account.getAccountNumber())).thenReturn(account);
+        when(accountRepository.findAccountByAccountId(account.getAccountId())).thenReturn(account);
 
-        accountService.updateAccount(account.getAccountNumber(), updatedAccount);
+        accountService.updateAccount(account.getAccountId(), updatedAccount);
 
         assertThat(account.getMoney(), is(100.00));
     }

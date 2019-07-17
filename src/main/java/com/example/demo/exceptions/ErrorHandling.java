@@ -50,4 +50,10 @@ public class ErrorHandling {
         response.sendError(HttpStatus.CONFLICT.value(), exc.getMessage());
     }
 
+    @ExceptionHandler(AccountAlreadyDeletedException.class)
+    public void AccountAlreadyDeletedException(AccountAlreadyDeletedException exc, HttpServletResponse response) throws IOException {
+        LOGGER.error(exc.getMessage());
+        response.sendError(HttpStatus.NOT_FOUND.value(), exc.getMessage());
+    }
+
 }

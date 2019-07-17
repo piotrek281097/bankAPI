@@ -7,9 +7,10 @@ import java.util.Optional;
 
 public interface AccountService {
     void addAccount(Account account);
-    void updateAccount(String accountNumber, Account account);
+    void updateAccount(long accountId, Account account);
     List<Account> getAllAccounts();
     Account findAccountByAccountNumber(String accountNumber);
-    void deleteAccountByNumber(String accountNumber);
+    Account findAccountByAccountId(long accountId);
+    void deleteAccountById(long accountId);
     List<Account> findAccountByOwnerName(String ownerName);
 }

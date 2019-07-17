@@ -31,19 +31,19 @@ public class TransferEndpoint {
         return new ResponseEntity<>(transferService.makeTransfer(accountNumberFrom, accountNumberTo, money), HttpStatus.OK);
     }
 
-    @GetMapping("transfers/findByNumber/{accountNumber}")
-    public ResponseEntity<?> getTransfersByAccountNumber(@PathVariable String accountNumber) {
-        return new ResponseEntity<>(transferService.getTransfersByAccountNumber(accountNumber), HttpStatus.OK);
+    @GetMapping("transfers/findByAccountId/{accountId}")
+    public ResponseEntity<?> getTransfersByAccountId(@PathVariable long accountId) {
+        return new ResponseEntity<>(transferService.getTransfersByAccountId(accountId), HttpStatus.OK);
     }
 
-    @GetMapping("transfersOut/findByNumber/{accountNumber}")
-    public ResponseEntity<?> getTransfersOutByAccountNumber(@PathVariable String accountNumber) {
-        return new ResponseEntity<>(transferService.getTransfersOutByAccountNumber(accountNumber), HttpStatus.OK);
+    @GetMapping("transfersOut/findByAccountId/{accountId}")
+    public ResponseEntity<?> getTransfersOutByAccountId(@PathVariable long accountId) {
+        return new ResponseEntity<>(transferService.getTransfersOutByAccountId(accountId), HttpStatus.OK);
     }
 
-    @GetMapping("transfersIn/findByNumber/{accountNumber}")
-    public ResponseEntity<?> getTransfersInByAccountNumber(@PathVariable String accountNumber) {
-        return new ResponseEntity<>(transferService.getTransfersInByAccountNumber(accountNumber), HttpStatus.OK);
+    @GetMapping("transfersIn/findByAccountId/{accountId}")
+    public ResponseEntity<?> getTransfersInByAccountId(@PathVariable long accountId) {
+        return new ResponseEntity<>(transferService.getTransfersInByAccountId(accountId), HttpStatus.OK);
     }
 
     @PutMapping("transfers/cancel/{transferId}")

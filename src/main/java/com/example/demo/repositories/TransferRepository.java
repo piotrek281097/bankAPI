@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface TransferRepository extends JpaRepository<Transfer, Long> {
 
-    List<Transfer> findByFirstAccountNumber(String accountNumber);
-    List<Transfer> findBySecondAccountNumber(String accountNumber);
+    List<Transfer> findByFirstAccountId(long accountId);
+    List<Transfer> findBySecondAccountId(long accountId);
     Transfer findByTransferId(long transferId);
 }

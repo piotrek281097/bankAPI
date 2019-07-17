@@ -12,9 +12,9 @@ public interface TransferService {
     List<Account> makeTransfer(String accountNumberFrom, String accountNumberTo, Double valueOfTransfer);
     List<Transfer> getAllTransfers();
     void addTransfer(Transfer transfer);
-    List<Transfer> getTransfersByAccountNumber(String accountNumber);
+    List<Transfer> getTransfersByAccountId(long accountId);
     void finishTransfers();
-    List<Transfer> getTransfersOutByAccountNumber(String accountNumber);
-    List<Transfer> getTransfersInByAccountNumber(String accountNumber);
+    List<Transfer> getTransfersOutByAccountId(long accountId);
+    List<Transfer> getTransfersInByAccountId(long accountId);
     Transfer cancelTransfer(long transferId);
 }
