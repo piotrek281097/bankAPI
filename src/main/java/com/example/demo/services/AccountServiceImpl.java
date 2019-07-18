@@ -83,7 +83,6 @@ public class AccountServiceImpl implements AccountService {
                 accountToSave.setOwnerName(account.getOwnerName());
             }
 
-            //addAccount(accountToSave);
             accountRepository.save(accountToSave);
         }
         else {
