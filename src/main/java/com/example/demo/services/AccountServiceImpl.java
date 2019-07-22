@@ -60,11 +60,12 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findAccountByAccountId(accountId);
 
         if (account != null) {
-            accountRepository.delete(account);
+            //accountRepository.delete(account);
+            account.setVisible(false);
+            updateAccount(accountId, account);
         }
         else {
             throw new AccountDoesNotExistException("Rachunek nie istnieje!");
-
         }
     }
 
@@ -92,7 +93,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> getAllAccounts() {
-        return accountRepository.findAll();
+        return accountRepository.findAccountByIsVisible(true);
     }
 
     @Override

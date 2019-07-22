@@ -14,7 +14,6 @@ import java.util.List;
 @RequestMapping("/api/")
 public class AccountEndpoint {
 
-
     private AccountService accountService;
 
     @Autowired
@@ -33,22 +32,16 @@ public class AccountEndpoint {
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
-
     @PutMapping("accounts/update/{accountId}")
     public ResponseEntity<Account> updateAccount(@PathVariable long accountId, @RequestBody Account account) {
         accountService.updateAccount(accountId, account);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("accounts/delete/{accountId}")
+    @PutMapping("accounts/delete/{accountId}")
     public ResponseEntity<?> deleteAccountByAccountId(@PathVariable long accountId) {
         accountService.deleteAccountById(accountId);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @GetMapping("accounts/findByNumber/{accountNumber}")
-    public ResponseEntity<Account> findAccountByAccountNumber(@PathVariable String accountNumber) {
-        return new ResponseEntity<>(accountService.findAccountByAccountNumber(accountNumber), HttpStatus.OK);
     }
 
     @GetMapping("accounts/findAccountByAccountId/{accountId}")

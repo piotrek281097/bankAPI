@@ -23,6 +23,7 @@ public class Account {
     private Double money;
     private String currency;
     private String ownerName;
+    private boolean isVisible = true;
 
 
     Account(String accountNumber, Double money, String currency, String ownerName)
