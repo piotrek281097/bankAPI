@@ -1,11 +1,8 @@
 package com.example.demo.entities;
 
-import com.example.demo.enums.TransferStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,20 +14,16 @@ public class Transfer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long transferId;
-
     @OneToOne
     private Account sendingAccount;
-
     @OneToOne
     private Account targetAccount;
-
     private double moneyBeforeConverting;
     private double money;
     private String currency;
     private LocalDateTime dataOpenTransfer;
     private LocalDateTime dataFinishTransfer;
     private String transferStatus;
-
 
     public Transfer(Account sendingAccount, Account targetAccount, Double moneyBeforeConverting, Double money, String currency, LocalDateTime dataOpenTransfer, LocalDateTime dataFinishTransfer, String transferStatus) {
         this.sendingAccount = sendingAccount;

@@ -56,4 +56,9 @@ public class ErrorHandling {
         response.sendError(HttpStatus.NOT_FOUND.value(), exc.getMessage());
     }
 
+    @ExceptionHandler(WrongDataException.class)
+    public void WrongDataException(WrongDataException exc, HttpServletResponse response) throws IOException {
+        LOGGER.error(exc.getMessage());
+        response.sendError(HttpStatus.NOT_ACCEPTABLE.value(), exc.getMessage());
+    }
 }

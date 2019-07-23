@@ -50,5 +50,4 @@ public class TransferEndpoint {
     public ResponseEntity<?> cancelTransfer(@PathVariable long transferId) {
         return new ResponseEntity<>(transferService.cancelTransfer(transferId), HttpStatus.OK);
     }
-
 }
