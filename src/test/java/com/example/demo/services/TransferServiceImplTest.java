@@ -29,7 +29,6 @@ public class TransferServiceImplTest {
 
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
-    private JavaMailSender javaMailSender;
 
     private String email;
 
@@ -68,7 +67,7 @@ public class TransferServiceImplTest {
         updatedAccount.setCurrency("USD");
         updatedAccount.setOwnerName("Owner4");
 
-        transferService = new TransferServiceImpl(accountRepository, transferRepository, javaMailSender);
+        transferService = new TransferServiceImpl(accountRepository, transferRepository);
         accountService = new AccountServiceImpl(accountRepository);
 
         email = "piotr.plecinski@wp.pl";

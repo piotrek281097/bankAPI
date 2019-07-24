@@ -26,13 +26,13 @@ public class TransferServiceImpl implements TransferService {
 
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
+    @Autowired
     private JavaMailSender javaMailSender;
 
     @Autowired
-    public TransferServiceImpl(AccountRepository accountRepository, TransferRepository transferRepository, JavaMailSender javaMailSender) {
+    public TransferServiceImpl(AccountRepository accountRepository, TransferRepository transferRepository) {
         this.accountRepository = accountRepository;
         this.transferRepository = transferRepository;
-        this.javaMailSender = javaMailSender;
     }
 
     @Override
