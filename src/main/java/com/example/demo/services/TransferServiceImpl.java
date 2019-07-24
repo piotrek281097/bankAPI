@@ -9,6 +9,8 @@ import com.example.demo.repositories.AccountRepository;
 import com.example.demo.repositories.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -24,11 +26,13 @@ public class TransferServiceImpl implements TransferService {
 
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
+    private JavaMailSender javaMailSender;
 
     @Autowired
-    public TransferServiceImpl(AccountRepository accountRepository, TransferRepository transferRepository) {
+    public TransferServiceImpl(AccountRepository accountRepository, TransferRepository transferRepository, JavaMailSender javaMailSender) {
         this.accountRepository = accountRepository;
         this.transferRepository = transferRepository;
+        this.javaMailSender = javaMailSender;
     }
 
     @Override
@@ -174,5 +178,16 @@ public class TransferServiceImpl implements TransferService {
     private void sendConfirmingTransferEmail(String email, String sendingAccountNumber, String targetAccountNumber, Double money) {
 
         System.out.println("--------------------------" + email + " " + sendingAccountNumber + " " + targetAccountNumber + " " + money);
+
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(email);
+
+        msg.setSubject("Potwierdzenie przelewu");
+        msg.setText("Przelew zostal wykonany." +
+                "\nNumer nadawcy: " + sendingAccountNumber +
+                 "\nNumer odbiorcy: " + targetAccountNumber +
+                "\nPienidze: " + money);
+
+        javaMailSender.send(msg);
     }
 }
