@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -28,6 +29,7 @@ public class TransferServiceImplTest {
 
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
+    private JavaMailSender javaMailSender;
 
     private String email;
 
@@ -66,7 +68,7 @@ public class TransferServiceImplTest {
         updatedAccount.setCurrency("USD");
         updatedAccount.setOwnerName("Owner4");
 
-        transferService = new TransferServiceImpl(accountRepository, transferRepository);
+        transferService = new TransferServiceImpl(accountRepository, transferRepository, javaMailSender);
         accountService = new AccountServiceImpl(accountRepository);
 
         email = "piotr.plecinski@wp.pl";
