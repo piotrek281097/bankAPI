@@ -29,6 +29,7 @@ public class TransferServiceImplTest {
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
 
+    private String email;
 
     @Before
     public void setup() {
@@ -67,6 +68,8 @@ public class TransferServiceImplTest {
 
         transferService = new TransferServiceImpl(accountRepository, transferRepository);
         accountService = new AccountServiceImpl(accountRepository);
+
+        email = "piotr.plecinski@wp.pl";
     }
 
     @Test(expected = NotEnoughMoneyToMakeTransferException.class)
@@ -75,7 +78,7 @@ public class TransferServiceImplTest {
         when(accountRepository.findAccountByAccountNumber(accountFromIsTransfer.getAccountNumber())).thenReturn(accountFromIsTransfer);
         when(accountRepository.findAccountByAccountNumber(accountToIsTransfer.getAccountNumber())).thenReturn(accountToIsTransfer);
 
-        transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 200.00);
+        transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 200.00, email);
     }
 
     @Test(expected = AccountDoesNotExistException.class)
@@ -90,8 +93,8 @@ public class TransferServiceImplTest {
         when(accountRepository.findAccountByAccountNumber(accountFromIsTransfer.getAccountNumber())).thenReturn(accountFromIsTransfer);
         when(accountRepository.findAccountByAccountNumber(accountToIsTransfer.getAccountNumber())).thenReturn(accountToIsTransfer);
 
-        transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 50.00);
-        transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 10.00);
+        transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 50.00, email);
+        transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 10.00, email);
 
         verify(accountRepository, times(2)).save(accountFromIsTransfer);
     }
@@ -112,7 +115,7 @@ public class TransferServiceImplTest {
         when(accountRepository.findAccountByAccountNumber(accountFromIsTransfer.getAccountNumber())).thenReturn(accountFromIsTransfer);
         when(accountRepository.findAccountByAccountNumber(accountToIsTransfer.getAccountNumber())).thenReturn(accountToIsTransfer);
 
-        transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 50.00);
+        transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 50.00, email);
 
         assertThat(accountFromIsTransfer.getMoney(), is(50.00));
     }

@@ -26,9 +26,10 @@ public class TransferEndpoint {
         return new ResponseEntity<>(transferService.getAllTransfers(), HttpStatus.OK);
     }
 
-    @PutMapping("accounts/transfer/{accountNumberFrom}/{accountNumberTo}/{money}")
-    public ResponseEntity<?> makeTransfer(@PathVariable String accountNumberFrom, @PathVariable String accountNumberTo, @PathVariable Double money) {
-        return new ResponseEntity<>(transferService.makeTransfer(accountNumberFrom, accountNumberTo, money), HttpStatus.OK);
+    @PutMapping("accounts/transfer/{accountNumberFrom}/{accountNumberTo}/{money}/{email}")
+    public ResponseEntity<?> makeTransfer(@PathVariable String accountNumberFrom, @PathVariable String accountNumberTo, @PathVariable Double money,
+                                          @PathVariable String email) {
+        return new ResponseEntity<>(transferService.makeTransfer(accountNumberFrom, accountNumberTo, money, email), HttpStatus.OK);
     }
 
     @GetMapping("transfers/findByAccountId/{accountId}")

@@ -32,7 +32,7 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public List<Account> makeTransfer(String accountNumberFrom, String accountNumberTo, Double valueOfTransfer) {
+    public List<Account> makeTransfer(String accountNumberFrom, String accountNumberTo, Double valueOfTransfer, String email) {
         Double newMoneyAmountToFirstAccount, moneyTransferAmountTo;
         List<Account> updatedAccountsList = new ArrayList<>();
 
@@ -61,6 +61,8 @@ public class TransferServiceImpl implements TransferService {
 
             addTransfer(new Transfer(firstAccount, secondAccount,
                     valueOfTransfer, moneyTransferAmountTo, secondAccount.getCurrency(), LocalDateTime.now(), null, TransferStatus.OPENED.getValue()));
+
+            sendConfirmingTransferEmail(email, accountNumberFrom, accountNumberTo, valueOfTransfer);
 
             return updatedAccountsList;
         } else return Collections.emptyList();
@@ -167,5 +169,10 @@ public class TransferServiceImpl implements TransferService {
         if (newMoney < 0) {
             throw new NotEnoughMoneyToMakeTransferException("Za malo pieniedzy");
         }
+    }
+
+    private void sendConfirmingTransferEmail(String email, String sendingAccountNumber, String targetAccountNumber, Double money) {
+
+        System.out.println("--------------------------" + email + " " + sendingAccountNumber + " " + targetAccountNumber + " " + money);
     }
 }

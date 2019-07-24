@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface TransferService {
 
-    List<Account> makeTransfer(String accountNumberFrom, String accountNumberTo, Double valueOfTransfer);
+    List<Account> makeTransfer(String accountNumberFrom, String accountNumberTo, Double valueOfTransfer, String email);
 
     List<Transfer> getAllTransfers();
 
