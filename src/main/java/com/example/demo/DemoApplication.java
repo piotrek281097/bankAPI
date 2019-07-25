@@ -18,6 +18,9 @@ public class DemoApplication extends SpringBootServletInitializer {
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
-
+	@Bean
+	public JavaMailSender getJavaMailSender() {
+		return new JavaMailSenderImpl();
+	}
 
 }
