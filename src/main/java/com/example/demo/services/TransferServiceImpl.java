@@ -188,7 +188,7 @@ public class TransferServiceImpl implements TransferService {
         javaMailSender.send(message);
         */
 
-        String to = "piotrbankapi2@gmail.com";
+        String to = email;
 
         // Put sender’s address
         String from = "piotrbankapi@gmail.com";
@@ -224,10 +224,11 @@ public class TransferServiceImpl implements TransferService {
                     InternetAddress.parse(to));
 
             // Set Subject: header field
-            message.setSubject("My first message with JavaMail");
+            message.setSubject("Potwierdzenie przelewu");
 
             // Put the content of your message
-            message.setText("Hi there, this is my first message sent with JavaMail");
+            message.setText("Przelew zlecony\nNr nadawcy: " + sendingAccountNumber + "\nNr odbiorcy: " +
+                    targetAccountNumber + "\nKwota: " + money);
 
             // Send message
             Transport.send(message);
