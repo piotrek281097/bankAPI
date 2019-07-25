@@ -221,7 +221,7 @@ public class TransferServiceImpl implements TransferService {
 
             // Set To: header field
             message.setRecipients(Message.RecipientType.TO,
-                    InternetAddress.parse(to));
+                    InternetAddress.parse(email));
 
             // Set Subject: header field
             message.setSubject("Potwierdzenie przelewu");
