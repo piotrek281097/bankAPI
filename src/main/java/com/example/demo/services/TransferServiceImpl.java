@@ -16,10 +16,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.*;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -204,26 +201,27 @@ public class TransferServiceImpl implements TransferService {
         prop.put("mail.smtp.starttls.enable", true);
         prop.put("mail.smtp.host", "smtp.gmail.com");
         prop.put("mail.smtp.port", "587");
-        prop.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
         Session session = Session.getInstance(prop, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("piotrbankapi", "Piotrek2810$");
+                return new PasswordAuthentication("piotrbankapi@gmail.com", "Piotrek2810$");
             }
         });
 
         try {
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("piotrbankapi@gmail.com"));
+            message.setFrom(new InternetAddress("piotrbankapi@gmail.com", false));
             message.setRecipients(
                     Message.RecipientType.TO, InternetAddress.parse("piotrbankapi2@gmail.com"));
             message.setSubject("Potwierdzenie przelewu");
 
             String msg = "Przelew został zrobiony";
 
+            message.setContent(msg, "text/html");
+
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
-            mimeBodyPart.setContent(msg, "text/html");
+            mimeBodyPart.setContent("email body content", "text/html");
 
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(mimeBodyPart);
@@ -232,8 +230,13 @@ public class TransferServiceImpl implements TransferService {
 
             Transport.send(message);
         }
-        catch (Exception ex) {
-            throw new ConnectionException("Bład z mailem");
+        catch (AddressException ex) {
+            ex.printStackTrace();
+            throw new ConnectionException("Adres ex");
+        }
+        catch (MessagingException ex) {
+            ex.printStackTrace();
+            throw new ConnectionException("message+ ex");
         }
 
     }
