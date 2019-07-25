@@ -177,7 +177,7 @@ public class TransferServiceImpl implements TransferService {
 
     private void sendConfirmingTransferEmail(String email, String sendingAccountNumber, String targetAccountNumber, Double money) {
 
-        System.out.println("--------------------------" + email + " " + sendingAccountNumber + " " + targetAccountNumber + " " + money);
+        System.out.println("--------------------------" + "piotr.plecinski1997@wp.pl" + " " + sendingAccountNumber + " " + targetAccountNumber + " " + money);
 
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setTo(email);
