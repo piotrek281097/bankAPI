@@ -1,9 +1,11 @@
 package com.example.demo.services;
 
 import com.example.demo.DTOs.CurrencyDto;
+import com.example.demo.DTOs.ExternalAccountDto;
 import com.example.demo.entities.Account;
 import com.example.demo.exceptions.*;
 import com.example.demo.repositories.AccountRepository;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import javax.validation.ConstraintViolationException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -74,6 +78,37 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<Account> getAllAccounts() {
         return accountRepository.findAccountByIsVisible(true);
+    }
+
+    @Override
+    public List<ExternalAccountDto> getAllExternalsAccounts() {
+/*
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://restapi97.herokuapp.com/api/accounts";
+        String result = restTemplate.getForObject(url, String.class);
+
+        Gson gson = new Gson();
+        ArrayList<ExternalAccountDto> externalAccountDtos =
+                new ArrayList<>(Arrays.asList(gson.fromJson(result, ExternalAccountDto[].class)));
+
+        return externalAccountDtos;
+    }
+    */
+
+        List<ExternalAccountDto> externalsAccounts = new ArrayList<>();
+        ExternalAccountDto[] externalAccountDtos;
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "https://restapi97.herokuapp.com/api/accounts";
+            ResponseEntity<ExternalAccountDto[]> response = restTemplate.getForEntity(url, ExternalAccountDto[].class);
+            externalAccountDtos = response.getBody();
+
+            return new ArrayList<>(Arrays.asList(externalAccountDtos));
+
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        }
+        return externalsAccounts;
     }
 
     @Override

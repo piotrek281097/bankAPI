@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.DTOs.ExternalAccountDto;
 import com.example.demo.entities.Account;
 
 import java.util.List;
@@ -12,6 +13,8 @@ public interface AccountService {
     void updateAccount(long accountId, Account account);
 
     List<Account> getAllAccounts();
+
+    List<ExternalAccountDto> getAllExternalsAccounts();
 
     Account findAccountByAccountNumber(String accountNumber);
 

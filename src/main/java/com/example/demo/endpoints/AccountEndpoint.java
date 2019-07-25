@@ -1,5 +1,6 @@
 package com.example.demo.endpoints;
 
+import com.example.demo.DTOs.ExternalAccountDto;
 import com.example.demo.entities.Account;
 import com.example.demo.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,11 @@ public class AccountEndpoint {
     @GetMapping("accounts")
     public ResponseEntity<List<Account>> getAccounts() {
         return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
+    }
+
+    @GetMapping("accounts-external")
+    public ResponseEntity<List<ExternalAccountDto>> getAllExternalAccounts() {
+        return new ResponseEntity<>(accountService.getAllExternalsAccounts(), HttpStatus.OK);
     }
 
     @PostMapping("accounts/add")
