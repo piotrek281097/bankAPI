@@ -180,33 +180,11 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private void sendConfirmingTransferEmail(String email, String sendingAccountNumber, String targetAccountNumber, Double money) {
-/*
-        System.out.println("--------------------------" + "piotr.plecinski1997@wp.pl" + " " + sendingAccountNumber + " " + targetAccountNumber + " " + money);
-
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo("piotr.plecinski1997@wp.pl");
-
-        msg.setSubject("Potwierdzenie przelewu");
-        msg.setText("Przelew zostal wykonany." +
-                "\nNumer nadawcy: " + sendingAccountNumber +
-                 "\nNumer odbiorcy: " + targetAccountNumber +
-                "\nPienidze: " + money);
-
-        javaMailSender.send(msg);
-  */
-
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(567);
-        mailSender.setUsername("piotrbankapi@gmail.com");
-        mailSender.setPassword("Piotrek2810$");
-
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setFrom("piotrbankapi@gmail.com");
-        mailMessage.setTo("piotrbankapi2@gmail.com");
-        mailMessage.setSubject("Potwierdzenie przelewu");
-        mailMessage.setText("CUD");
-
-        mailSender.send(mailMessage);
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo("piotrbankapi2@gmail.com");
+        message.setSubject("Potwierdzenie przelewu");
+        message.setText("CUD");
+        javaMailSender.send(message);
     }
+
 }
