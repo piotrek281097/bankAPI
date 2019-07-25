@@ -197,7 +197,7 @@ public class TransferServiceImpl implements TransferService {
         javaMailSender.send(msg);
   */
 
-
+        System.out.println("MAIL_________________________________________");
 
         Properties prop = new Properties();
         prop.put("mail.smtp.auth", true);
@@ -233,7 +233,7 @@ public class TransferServiceImpl implements TransferService {
             Transport.send(message);
         }
         catch (Exception ex) {
-            ex.printStackTrace();
+            throw new ConnectionException("Bład z mailem");
         }
 
     }
