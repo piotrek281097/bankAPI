@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -194,52 +195,18 @@ public class TransferServiceImpl implements TransferService {
         javaMailSender.send(msg);
   */
 
-        System.out.println("MAIL_________________________________________");
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost("smtp.gmail.com");
+        mailSender.setPort(567);
+        mailSender.setUsername("piotrbankapi@gmail.com");
+        mailSender.setPassword("Piotrek2810$");
 
-        Properties prop = new Properties();
-        prop.put("mail.smtp.auth", true);
-        prop.put("mail.smtp.starttls.enable", true);
-        prop.put("mail.smtp.host", "smtp.gmail.com");
-        prop.put("mail.smtp.port", "587");
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom("piotrbankapi@gmail.com");
+        mailMessage.setTo("piotrbankapi2@gmail.com");
+        mailMessage.setSubject("Potwierdzenie przelewu");
+        mailMessage.setText("CUD");
 
-        Session session = Session.getInstance(prop, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("piotrbankapi@gmail.com", "Piotrek2810$");
-            }
-        });
-
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("piotrbankapi@gmail.com", false));
-            message.setRecipients(
-                    Message.RecipientType.TO, InternetAddress.parse("piotrbankapi2@gmail.com"));
-            message.setSubject("Potwierdzenie przelewu");
-
-            String msg = "Przelew został zrobiony";
-
-            message.setContent(msg, "text/html");
-
-            MimeBodyPart mimeBodyPart = new MimeBodyPart();
-            mimeBodyPart.setContent("email body content", "text/html");
-
-            Multipart multipart = new MimeMultipart();
-            multipart.addBodyPart(mimeBodyPart);
-
-            message.setContent(multipart);
-
-            Transport.send(message);
-        }
-        catch (AddressException ex) {
-            ex.printStackTrace();
-            throw new ConnectionException("Adres ex");
-        }
-        catch (MessagingException ex) {
-            ex.printStackTrace();
-            throw new ConnectionException("message+ ex");
-        }
-
+        mailSender.send(mailMessage);
     }
-
-
 }
