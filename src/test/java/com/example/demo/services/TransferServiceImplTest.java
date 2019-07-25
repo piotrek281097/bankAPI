@@ -21,14 +21,14 @@ public class TransferServiceImplTest {
 
     private TransferService transferService;
     private AccountService accountService;
+    private AccountRepository accountRepository;
+    private TransferRepository transferRepository;
 
     private Account accountFromIsTransfer;
     private Account accountToIsTransfer;
     private Account account;
     private Account updatedAccount;
 
-    private AccountRepository accountRepository;
-    private TransferRepository transferRepository;
 
     private String email;
 
