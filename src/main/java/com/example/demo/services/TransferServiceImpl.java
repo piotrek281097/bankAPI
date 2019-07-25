@@ -15,6 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -177,11 +182,11 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private void sendConfirmingTransferEmail(String email, String sendingAccountNumber, String targetAccountNumber, Double money) {
-
+/*
         System.out.println("--------------------------" + "piotr.plecinski1997@wp.pl" + " " + sendingAccountNumber + " " + targetAccountNumber + " " + money);
 
         SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo(email);
+        msg.setTo("piotr.plecinski1997@wp.pl");
 
         msg.setSubject("Potwierdzenie przelewu");
         msg.setText("Przelew zostal wykonany." +
@@ -190,5 +195,45 @@ public class TransferServiceImpl implements TransferService {
                 "\nPienidze: " + money);
 
         javaMailSender.send(msg);
+  */
+        Properties prop = new Properties();
+        prop.put("mail.smtp.auth", true);
+        prop.put("mail.smtp.starttls.enable", "true");
+        prop.put("mail.smtp.host", "smtp.mailtrap.io");
+        prop.put("mail.smtp.port", "25");
+        prop.put("mail.smtp.ssl.trust", "smtp.mailtrap.io");
+
+        Session session = Session.getInstance(prop, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("piotrbankapi", "Piotrek2810$");
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("piotrbankapi@gmail.com"));
+            message.setRecipients(
+                    Message.RecipientType.TO, InternetAddress.parse("piotrbankapi2@gmail.com"));
+            message.setSubject("Potwierdzenie przelewu");
+
+            String msg = "Przelew został zrobiony";
+
+            MimeBodyPart mimeBodyPart = new MimeBodyPart();
+            mimeBodyPart.setContent(msg, "text/html");
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(mimeBodyPart);
+
+            message.setContent(multipart);
+
+            Transport.send(message);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
     }
+
+
 }
