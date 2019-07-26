@@ -8,6 +8,7 @@ import com.example.demo.exceptions.NotEnoughMoneyToMakeTransferException;
 import com.example.demo.repositories.AccountRepository;
 import com.example.demo.repositories.ExternalTransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,11 +21,13 @@ public class ExternalTransferServiceImpl implements ExternalTransferService {
 
     private AccountRepository accountRepository;
     private ExternalTransferRepository externalTransferRepository;
+    private EmailService emailService;
 
     @Autowired
-    public ExternalTransferServiceImpl(AccountRepository accountRepository, ExternalTransferRepository externalTransferRepository) {
+    public ExternalTransferServiceImpl(AccountRepository accountRepository, ExternalTransferRepository externalTransferRepository, EmailService emailService) {
         this.accountRepository = accountRepository;
         this.externalTransferRepository = externalTransferRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -46,8 +49,6 @@ public class ExternalTransferServiceImpl implements ExternalTransferService {
                 addExternalTransfer(externalTransfer);
 
                 sendExternalTransfer(externalTransfer);
-
-            //sendConfirmingTransferEmail(email, accountNumberFrom, accountNumberTo, valueOfTransfer);
 
             return myAccount;
         } else return null;
@@ -88,5 +89,13 @@ public class ExternalTransferServiceImpl implements ExternalTransferService {
                                                      .build();
 
         ResponseEntity<Object> objectResponseEntity = restTemplate.postForEntity("https://comarch.herokuapp.com/transfer/external-transfer", dto, null);
+
+        System.out.println("STATUS: " + objectResponseEntity.getStatusCode());
+
+        if(objectResponseEntity.getStatusCode() == HttpStatus.OK) {
+            emailService.sendConfirmingTransferEmail("piotr.plecinski1997@wp.pl", externalTransfer.getExternalAccount(),
+                    externalTransfer.getToAccount(), externalTransfer.getAmount().doubleValue());
+        }
+        System.out.println("Resposne entity " + objectResponseEntity);
     }
 }

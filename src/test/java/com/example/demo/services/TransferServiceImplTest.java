@@ -19,6 +19,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import java.math.BigDecimal;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -28,6 +29,7 @@ public class TransferServiceImplTest {
     private TransferService transferService;
     private AccountService accountService;
     private ExternalTransferService externalTransferService;
+    private EmailService emailService;
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
     private ExternalTransferRepository externalTransferRepository;
@@ -47,6 +49,7 @@ public class TransferServiceImplTest {
         accountRepository = mock(AccountRepository.class);
         transferRepository = mock(TransferRepository.class);
         externalTransferRepository = mock(ExternalTransferRepository.class);
+        emailService = mock(EmailService.class);
 
         accountFromIsTransfer = new Account();
         accountFromIsTransfer.setAccountNumber("12345678901234567890123456");
@@ -88,9 +91,9 @@ public class TransferServiceImplTest {
         externalTransfer = new ExternalTransfer("12345678901234567890123456", "12345678901234567890123451", BigDecimal.valueOf(20.0),
                 "EUR", "myBank88");
 
-        transferService = new TransferServiceImpl(accountRepository, transferRepository);
+        transferService = new TransferServiceImpl(accountRepository, transferRepository, emailService);
         accountService = new AccountServiceImpl(accountRepository);
-        externalTransferService = new ExternalTransferServiceImpl(accountRepository, externalTransferRepository);
+        externalTransferService = new ExternalTransferServiceImpl(accountRepository, externalTransferRepository, emailService);
 
         email = "piotr.plecinski@wp.pl";
     }
@@ -111,11 +114,11 @@ public class TransferServiceImplTest {
         accountService.findAccountByAccountNumber("123456");
     }
 
-    @Ignore
     @Test
     public void testShouldReturnMethodSaveWasCalledTwice() {
         when(accountRepository.findAccountByAccountNumber(accountFromIsTransfer.getAccountNumber())).thenReturn(accountFromIsTransfer);
         when(accountRepository.findAccountByAccountNumber(accountToIsTransfer.getAccountNumber())).thenReturn(accountToIsTransfer);
+        doNothing().when(emailService).sendConfirmingTransferEmail(anyString(), anyString(), anyString(), anyDouble());
 
         transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 50.00, email);
         transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 10.00, email);
@@ -133,12 +136,12 @@ public class TransferServiceImplTest {
         assertThat(account.getMoney(), is(100.00));
     }
 
-    @Ignore
     @Test
     public void testShouldReturnThatMoneyIsDeductedFromFirstAccount() {
 
         when(accountRepository.findAccountByAccountNumber(accountFromIsTransfer.getAccountNumber())).thenReturn(accountFromIsTransfer);
         when(accountRepository.findAccountByAccountNumber(accountToIsTransfer.getAccountNumber())).thenReturn(accountToIsTransfer);
+        doNothing().when(emailService).sendConfirmingTransferEmail(anyString(), anyString(), anyString(), anyDouble());
 
         transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 50.00, email);
 
