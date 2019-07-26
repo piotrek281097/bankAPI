@@ -9,9 +9,6 @@ import com.example.demo.repositories.AccountRepository;
 import com.example.demo.repositories.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -30,8 +27,6 @@ public class TransferServiceImpl implements TransferService {
 
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
-    //@Autowired
-    //private JavaMailSender javaMailSender;
 
     @Autowired
     public TransferServiceImpl(AccountRepository accountRepository, TransferRepository transferRepository) {
@@ -180,13 +175,6 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private void sendConfirmingTransferEmail(String email, String sendingAccountNumber, String targetAccountNumber, Double money) {
-        /*
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo("piotrbankapi2@gmail.com");
-        message.setSubject("Potwierdzenie przelewu");
-        message.setText("CUD");
-        javaMailSender.send(message);
-        */
 
         String to = email;
 

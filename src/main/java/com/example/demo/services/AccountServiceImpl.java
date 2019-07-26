@@ -82,19 +82,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<ExternalAccountDto> getAllExternalsAccounts() {
-/*
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "https://restapi97.herokuapp.com/api/accounts";
-        String result = restTemplate.getForObject(url, String.class);
-
-        Gson gson = new Gson();
-        ArrayList<ExternalAccountDto> externalAccountDtos =
-                new ArrayList<>(Arrays.asList(gson.fromJson(result, ExternalAccountDto[].class)));
-
-        return externalAccountDtos;
-    }
-    */
-
         List<ExternalAccountDto> externalsAccounts = new ArrayList<>();
         ExternalAccountDto[] externalAccountDtos;
         try {

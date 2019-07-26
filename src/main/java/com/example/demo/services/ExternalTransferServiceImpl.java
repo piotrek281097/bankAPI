@@ -76,7 +76,7 @@ public class ExternalTransferServiceImpl implements ExternalTransferService {
         return Double.parseDouble(newValue);
     }
 
-    public void sendExternalTransfer(ExternalTransfer externalTransfer) {
+    private void sendExternalTransfer(ExternalTransfer externalTransfer) {
 
         RestTemplate restTemplate = new RestTemplate();
         ExternalTransferDto dto = ExternalTransferDto.builder()
