@@ -27,17 +27,15 @@ public class TransferServiceImpl implements TransferService {
 
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
-    private EmailService emailService;
 
     @Autowired
-    public TransferServiceImpl(AccountRepository accountRepository, TransferRepository transferRepository, EmailService emailService) {
+    public TransferServiceImpl(AccountRepository accountRepository, TransferRepository transferRepository) {
         this.accountRepository = accountRepository;
         this.transferRepository = transferRepository;
-        this.emailService = emailService;
     }
 
     @Override
-    public List<Account> makeTransfer(String accountNumberFrom, String accountNumberTo, Double valueOfTransfer, String email) {
+    public List<Account> makeTransfer(String accountNumberFrom, String accountNumberTo, Double valueOfTransfer) {
         Double newMoneyAmountToFirstAccount, moneyTransferAmountTo;
         List<Account> updatedAccountsList = new ArrayList<>();
 
@@ -66,8 +64,6 @@ public class TransferServiceImpl implements TransferService {
 
             addTransfer(new Transfer(firstAccount, secondAccount,
                     valueOfTransfer, moneyTransferAmountTo, secondAccount.getCurrency(), LocalDateTime.now(), null, TransferStatus.OPENED.getValue()));
-
-            sendConfirmingTransferEmail(email, accountNumberFrom, accountNumberTo, valueOfTransfer);
 
             return updatedAccountsList;
         } else return Collections.emptyList();
@@ -175,9 +171,4 @@ public class TransferServiceImpl implements TransferService {
             throw new NotEnoughMoneyToMakeTransferException("Za malo pieniedzy");
         }
     }
-
-    void sendConfirmingTransferEmail(String email, String sendingAccountNumber, String targetAccountNumber, Double money) {
-        emailService.sendConfirmingTransferEmail(email, sendingAccountNumber, targetAccountNumber, money);
-    }
-
 }
