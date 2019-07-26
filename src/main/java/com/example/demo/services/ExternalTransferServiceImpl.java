@@ -31,7 +31,7 @@ public class ExternalTransferServiceImpl implements ExternalTransferService {
     }
 
     @Override
-    public Account makeExternalTransfer(ExternalTransfer externalTransfer) {
+    public Account makeExternalTransfer(ExternalTransfer externalTransfer, String email) {
 
             if(!externalTransfer.getExternalAccount().equals(externalTransfer.getToAccount())) {
                 externalTransfer.setAmount(BigDecimal.valueOf(roundValue(Double.parseDouble(externalTransfer.getAmount().toString()))));
@@ -46,9 +46,7 @@ public class ExternalTransferServiceImpl implements ExternalTransferService {
 
                 accountRepository.save(myAccount);
 
-                addExternalTransfer(externalTransfer);
-
-                sendExternalTransfer(externalTransfer);
+                sendExternalTransfer(externalTransfer, email);
 
             return myAccount;
         } else return null;
@@ -77,7 +75,7 @@ public class ExternalTransferServiceImpl implements ExternalTransferService {
         return Double.parseDouble(newValue);
     }
 
-    private void sendExternalTransfer(ExternalTransfer externalTransfer) {
+    private void sendExternalTransfer(ExternalTransfer externalTransfer, String email) {
 
         RestTemplate restTemplate = new RestTemplate();
         ExternalTransferDto dto = ExternalTransferDto.builder()
@@ -90,12 +88,11 @@ public class ExternalTransferServiceImpl implements ExternalTransferService {
 
         ResponseEntity<Object> objectResponseEntity = restTemplate.postForEntity("https://comarch.herokuapp.com/transfer/external-transfer", dto, null);
 
-        System.out.println("STATUS: " + objectResponseEntity.getStatusCode());
-
         if(objectResponseEntity.getStatusCode() == HttpStatus.OK) {
-            emailService.sendConfirmingTransferEmail("piotr.plecinski1997@wp.pl", externalTransfer.getExternalAccount(),
+            emailService.sendConfirmingTransferEmail(email, externalTransfer.getExternalAccount(),
                     externalTransfer.getToAccount(), externalTransfer.getAmount().doubleValue());
+
+            addExternalTransfer(externalTransfer);
         }
-        System.out.println("Resposne entity " + objectResponseEntity);
     }
 }

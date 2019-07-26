@@ -167,7 +167,7 @@ public class TransferServiceImplTest {
     @Test
     public void testShouldReturnThatMoneyIsDeductedFromSendingAccount() {
         when(accountRepository.findAccountByAccountNumber(externalTransfer.getExternalAccount())).thenReturn(account);
-        externalTransferService.makeExternalTransfer(externalTransfer);
+        externalTransferService.makeExternalTransfer(externalTransfer, email);
 
         assertThat(account.getMoney(), is(180.00));
     }
