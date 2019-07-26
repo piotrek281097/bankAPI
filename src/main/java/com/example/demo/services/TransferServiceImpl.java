@@ -1,6 +1,8 @@
 package com.example.demo.services;
 
 import com.example.demo.DTOs.CurrencyDto;
+import com.example.demo.Utils.CheckingMethodsObject;
+import com.example.demo.Utils.MathematicalMethodsObject;
 import com.example.demo.enums.TransferStatus;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.Transfer;
@@ -13,14 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.mail.*;
-import javax.mail.internet.*;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 @Service
 public class TransferServiceImpl implements TransferService {
@@ -40,11 +39,11 @@ public class TransferServiceImpl implements TransferService {
         List<Account> updatedAccountsList = new ArrayList<>();
 
         if (!accountNumberFrom.equals(accountNumberTo)) {
-            valueOfTransfer = roundValue(valueOfTransfer);
+            valueOfTransfer = MathematicalMethodsObject.roundValue(valueOfTransfer);
             Account firstAccount = accountRepository.findAccountByAccountNumber(accountNumberFrom);
             Account secondAccount = accountRepository.findAccountByAccountNumber(accountNumberTo);
 
-            checkingIfAccountsExist(firstAccount, secondAccount);
+            CheckingMethodsObject.checkingIfAccountsExist(firstAccount, secondAccount);
 
             if (firstAccount.getCurrency().equals(secondAccount.getCurrency())) {
                 newMoneyAmountToFirstAccount = firstAccount.getMoney() - valueOfTransfer;
@@ -54,7 +53,7 @@ public class TransferServiceImpl implements TransferService {
                 newMoneyAmountToFirstAccount = firstAccount.getMoney() - valueOfTransfer;
             }
 
-            checkingIfThereIsEnoughMoneyToMakeTransfer(newMoneyAmountToFirstAccount);
+            CheckingMethodsObject.checkingIfThereIsEnoughMoneyToMakeTransfer(newMoneyAmountToFirstAccount);
             firstAccount.setMoney(newMoneyAmountToFirstAccount);
 
             updatedAccountsList.add(firstAccount);
@@ -107,7 +106,7 @@ public class TransferServiceImpl implements TransferService {
             ResponseEntity<CurrencyDto> response = restTemplate.getForEntity(url, CurrencyDto.class);
             CurrencyDto currencyDto = response.getBody();
 
-            return roundValue(valueOfTransfer * currencyDto.getRates().get(currency2));
+            return MathematicalMethodsObject.roundValue(valueOfTransfer * currencyDto.getRates().get(currency2));
         } catch (NullPointerException ex) {
             throw new CurrencyIsNotAvailableException("Blad w konwersji walut");
         } catch (ResourceAccessException ex) {
@@ -121,7 +120,7 @@ public class TransferServiceImpl implements TransferService {
         for (Transfer transfer: transfers) {
             Account secondAccount = accountRepository.findAccountByAccountNumber(transfer.getTargetAccount().getAccountNumber());
             if (secondAccount != null && secondAccount.isVisible()) {
-                secondAccount.setMoney(roundValue(secondAccount.getMoney() + transfer.getMoney()));
+                secondAccount.setMoney(MathematicalMethodsObject.roundValue(secondAccount.getMoney() + transfer.getMoney()));
                 accountRepository.save(secondAccount);
 
                 transfer.setTransferStatus(TransferStatus.FINISHED.getValue());
@@ -132,13 +131,6 @@ public class TransferServiceImpl implements TransferService {
                 throw new AccountAlreadyDeletedException("Konto zostało usunięte! Nie można dokonać zaplanowanych czynności");
             }
         }
-    }
-
-    private static double roundValue(Double value) {
-        String newValue = new DecimalFormat("##.##").format(value);
-        newValue = newValue.replace(",", ".");
-
-        return Double.parseDouble(newValue);
     }
 
     @Override
@@ -156,19 +148,5 @@ public class TransferServiceImpl implements TransferService {
         }
 
         return canceledTransfer;
-    }
-
-    private void checkingIfAccountsExist(Account sendingAccount, Account targetAccount) {
-        if (sendingAccount == null) {
-            throw new AccountDoesNotExistException("Rachunek z ktorego mial byc przelew nie istnieje 1");
-        } else if (targetAccount == null) {
-            throw new AccountDoesNotExistException("Rachunek na ktory mial byc przelew nie istnieje 2");
-        }
-    }
-
-    private void checkingIfThereIsEnoughMoneyToMakeTransfer(Double newMoney) {
-        if (newMoney < 0) {
-            throw new NotEnoughMoneyToMakeTransferException("Za malo pieniedzy");
-        }
     }
 }

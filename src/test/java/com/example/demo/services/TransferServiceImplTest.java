@@ -87,7 +87,6 @@ public class TransferServiceImplTest {
         updatedAccount.setCurrency("USD");
         updatedAccount.setOwnerName("Owner4");
 
-        //String externalAccount, String toAccount, BigDecimal amount, String currency, String bankName
         externalTransfer = new ExternalTransfer("12345678901234567890123456", "12345678901234567890123451", BigDecimal.valueOf(20.0),
                 "EUR", "myBank88");
 
