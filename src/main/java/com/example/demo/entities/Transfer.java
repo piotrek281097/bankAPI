@@ -1,14 +1,18 @@
 package com.example.demo.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Builder
 @Data
 @Entity
-@Table(name = "transfers")
+@AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "transfers")
 public class Transfer {
 
     @Id

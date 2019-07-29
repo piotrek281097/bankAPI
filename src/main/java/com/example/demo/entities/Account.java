@@ -1,8 +1,6 @@
 package com.example.demo.entities;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.format.annotation.NumberFormat;
 
@@ -10,8 +8,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+@Builder
 @Data
 @Entity
+@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "accounts")
 public class Account {

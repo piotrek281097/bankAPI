@@ -14,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-
-import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,8 +59,19 @@ public class TransferServiceImpl implements TransferService {
 
             accountRepository.save(firstAccount);
 
-            addTransfer(new Transfer(firstAccount, secondAccount,
-                    valueOfTransfer, moneyTransferAmountTo, secondAccount.getCurrency(), LocalDateTime.now(), null, TransferStatus.OPENED.getValue()));
+            Transfer newTransfer = Transfer.builder()
+                                           .sendingAccount(firstAccount)
+                                           .targetAccount(secondAccount)
+                                           .moneyBeforeConverting(valueOfTransfer)
+                                           .money(moneyTransferAmountTo)
+                                           .currency(secondAccount.getCurrency())
+                                           .dataOpenTransfer(LocalDateTime.now())
+                                           .dataFinishTransfer(null)
+                                           .transferStatus(TransferStatus.OPENED.getValue())
+                                           .build();
+
+
+            addTransfer(newTransfer);
 
             return updatedAccountsList;
         } else return Collections.emptyList();

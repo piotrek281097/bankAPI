@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import com.example.demo.entities.Account;
 import com.example.demo.entities.ExternalTransfer;
+import com.example.demo.entities.Transfer;
 import com.example.demo.exceptions.AccountDoesNotExistException;
 import com.example.demo.exceptions.AccountWithThisNumberAlreadyExistsException;
 import com.example.demo.exceptions.NotEnoughMoneyToMakeTransferException;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -27,74 +30,55 @@ import static org.mockito.Mockito.*;
 public class TransferServiceImplTest {
 
     private TransferService transferService;
-    private AccountService accountService;
-    private ExternalTransferService externalTransferService;
-    private EmailService emailService;
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
-    private ExternalTransferRepository externalTransferRepository;
 
     private Account accountFromIsTransfer;
     private Account accountToIsTransfer;
     private Account account, account2;
-    private Account accountTheSameNumber;
-    private Account updatedAccount;
-    private ExternalTransfer externalTransfer;
 
-
-    private String email;
+    private Transfer transfer;
 
     @Before
     public void setup() {
         accountRepository = mock(AccountRepository.class);
         transferRepository = mock(TransferRepository.class);
-        externalTransferRepository = mock(ExternalTransferRepository.class);
-        emailService = mock(EmailService.class);
 
-        accountFromIsTransfer = new Account();
-        accountFromIsTransfer.setAccountNumber("12345678901234567890123456");
-        accountFromIsTransfer.setMoney(100.00);
-        accountFromIsTransfer.setCurrency("USD");
-        accountFromIsTransfer.setOwnerName("Owner1");
+        accountFromIsTransfer = Account.builder()
+                                       .accountNumber("12345678901234567890123456")
+                                       .money(100.00)
+                                       .currency("USD")
+                                       .ownerName("Owner1")
+                                       .isVisible(true)
+                                       .build();
 
-        accountToIsTransfer = new Account();
-        accountToIsTransfer.setAccountNumber("22345678901234567890123456");
-        accountToIsTransfer.setMoney(20.00);
-        accountToIsTransfer.setCurrency("USD");
-        accountToIsTransfer.setOwnerName("Owner2");
+        accountToIsTransfer = Account.builder()
+                                       .accountNumber("22345678901234567890123456")
+                                       .money(20.00)
+                                       .currency("USD")
+                                       .ownerName("Owner2")
+                                       .isVisible(true)
+                                       .build();
 
-        account2 = new Account();
-        account2.setAccountNumber("52345678901234567890123456");
-        account2.setMoney(500.00);
-        account2.setCurrency("USD");
-        account2.setOwnerName("Owner5");
+        account = Account.builder()
+                         .accountNumber("32345678901234567890123456")
+                         .money(200.00)
+                         .currency("EUR")
+                         .ownerName("Owner3")
+                         .isVisible(true)
+                         .build();
 
-        account = new Account();
-        account.setAccountNumber("32345678901234567890123456");
-        account.setMoney(200.00);
-        account.setCurrency("EUR");
-        account.setOwnerName("Owner3");
 
-        accountTheSameNumber = new Account();
-        accountTheSameNumber.setAccountNumber("32345678901234567890123456");
-        accountTheSameNumber.setMoney(20.00);
-        accountTheSameNumber.setCurrency("USD");
-        accountTheSameNumber.setOwnerName("Owner4");
-
-        updatedAccount = new Account();
-        updatedAccount.setAccountNumber("42345678901234567890123456");
-        updatedAccount.setMoney(100.00);
-        updatedAccount.setCurrency("USD");
-        updatedAccount.setOwnerName("Owner4");
-
-        externalTransfer = new ExternalTransfer("12345678901234567890123456", "12345678901234567890123451", BigDecimal.valueOf(20.0),
-                "EUR", "myBank88");
+        transfer = new Transfer();
+        transfer.setSendingAccount(accountFromIsTransfer);
+        transfer.setTargetAccount(accountToIsTransfer);
+        transfer.setMoney(100);
+        transfer.setCurrency("EUR");
+        transfer.setTransferStatus("OPENED");
+        transfer.setDataOpenTransfer(LocalDateTime.now());
+        transfer.setDataFinishTransfer(null);
 
         transferService = new TransferServiceImpl(accountRepository, transferRepository);
-        accountService = new AccountServiceImpl(accountRepository);
-        externalTransferService = new ExternalTransferServiceImpl(accountRepository, externalTransferRepository, emailService);
-
-        email = "piotr.plecinski@wp.pl";
     }
 
     @Test(expected = NotEnoughMoneyToMakeTransferException.class)
@@ -106,18 +90,10 @@ public class TransferServiceImplTest {
         transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 200.00);
     }
 
-    @Test(expected = AccountDoesNotExistException.class)
-    public void testShouldReturnAccountDoesNotExistException() {
-
-        when(accountRepository.findAccountByAccountNumber(any(String.class))).thenReturn(null);
-        accountService.findAccountByAccountNumber("123456");
-    }
-
     @Test
     public void testShouldReturnMethodSaveWasCalledTwice() {
         when(accountRepository.findAccountByAccountNumber(accountFromIsTransfer.getAccountNumber())).thenReturn(accountFromIsTransfer);
         when(accountRepository.findAccountByAccountNumber(accountToIsTransfer.getAccountNumber())).thenReturn(accountToIsTransfer);
-        doNothing().when(emailService).sendConfirmingTransferEmail(anyString(), anyString(), anyString(), anyDouble());
 
         transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 50.00);
         transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 10.00);
@@ -125,49 +101,52 @@ public class TransferServiceImplTest {
         verify(accountRepository, times(2)).save(accountFromIsTransfer);
     }
 
-
-    @Test
-    public void testShouldReturnThatUpdateWorksCorrectly() {
-        when(accountRepository.findAccountByAccountId(account.getAccountId())).thenReturn(account);
-
-        accountService.updateAccount(account.getAccountId(), updatedAccount);
-
-        assertThat(account.getMoney(), is(100.00));
-    }
-
     @Test
     public void testShouldReturnThatMoneyIsDeductedFromFirstAccount() {
 
         when(accountRepository.findAccountByAccountNumber(accountFromIsTransfer.getAccountNumber())).thenReturn(accountFromIsTransfer);
         when(accountRepository.findAccountByAccountNumber(accountToIsTransfer.getAccountNumber())).thenReturn(accountToIsTransfer);
-        doNothing().when(emailService).sendConfirmingTransferEmail(anyString(), anyString(), anyString(), anyDouble());
 
         transferService.makeTransfer(accountFromIsTransfer.getAccountNumber(), accountToIsTransfer.getAccountNumber(), 50.00);
 
         assertThat(accountFromIsTransfer.getMoney(), is(50.00));
     }
 
-    @Test(expected = AccountWithThisNumberAlreadyExistsException.class)
-    public void testShouldReturnAccountWithThisNumberAlreadyExistsException() {
-        when(accountRepository.findAccountByAccountNumber(account.getAccountNumber())).thenReturn(account);
-        accountService.addAccount(account);
-        accountService.addAccount(accountTheSameNumber);
+    @Test
+    public void testShouldReturnThatMethodFindBySendingAccountAccountIdWasCalledOnce() {
+        when(transferRepository.findBySendingAccountAccountId(account.getAccountId())).thenReturn(new ArrayList<>());
+        transferService.getTransfersOutByAccountId(account.getAccountId());
+        transferService.getTransfersOutByAccountId(account.getAccountId());
+
+        verify(transferRepository, times(2)).findBySendingAccountAccountId(account.getAccountId());
     }
 
     @Test
-    public void testShouldReturnMethodSaveWasCalledOnceWhileAddingAccount() {
-        when(accountRepository.findAccountByAccountNumber(account.getAccountNumber())).thenReturn(null);
-        accountService.addAccount(account);
+    public void testShouldReturnThatMethodFindByTargetAccountAccountIdWasCalledOnce() {
+        when(transferRepository.findByTargetAccountAccountId(account.getAccountId())).thenReturn(new ArrayList<>());
+        transferService.getTransfersInByAccountId(account.getAccountId());
 
-        verify(accountRepository, times(1)).save(account);
+        verify(transferRepository, times(1)).findByTargetAccountAccountId(account.getAccountId());
     }
-
 
     @Test
-    public void testShouldReturnThatMoneyIsDeductedFromSendingAccount() {
-        when(accountRepository.findAccountByAccountNumber(externalTransfer.getExternalAccount())).thenReturn(account);
-        externalTransferService.makeExternalTransfer(externalTransfer, email);
+    public void testShouldReturnThatMethodFindBySendingAndTargetAccountAccountIdWereCalledTwice() {
+        when(transferRepository.findBySendingAccountAccountId(account.getAccountId())).thenReturn(new ArrayList<>());
+        when(transferRepository.findByTargetAccountAccountId(account.getAccountId())).thenReturn(new ArrayList<>());
 
-        assertThat(account.getMoney(), is(180.00));
+        transferService.getTransfersByAccountId(account.getAccountId());
+        transferService.getTransfersByAccountId(account.getAccountId());
+
+        verify(transferRepository, times(2)).findBySendingAccountAccountId(account.getAccountId());
+        verify(transferRepository, times(2)).findByTargetAccountAccountId(account.getAccountId());
     }
+
+    @Test
+    public void testShouldReturnThatMethodSaveWasCalledOnce() {
+        when(transferRepository.findByTransferId(transfer.getTransferId())).thenReturn(transfer);
+
+
+        //verify(transferRepository, times(2)).findByTargetAccountAccountId(account.getAccountId());
+    }
+
 }

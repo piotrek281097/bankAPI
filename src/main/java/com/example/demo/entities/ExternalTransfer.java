@@ -1,15 +1,19 @@
 package com.example.demo.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 
+@Builder
 @Data
 @Entity
-@Table(name = "externalTransfers")
+@AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "externalTransfers")
 
 public class ExternalTransfer {
     @Id
