@@ -1,30 +1,20 @@
 package com.example.demo.services;
 
 import com.example.demo.entities.Account;
-import com.example.demo.entities.ExternalTransfer;
 import com.example.demo.entities.Transfer;
-import com.example.demo.exceptions.AccountDoesNotExistException;
-import com.example.demo.exceptions.AccountWithThisNumberAlreadyExistsException;
+import com.example.demo.enums.TransferStatus;
+import com.example.demo.exceptions.AccountAlreadyDeletedException;
 import com.example.demo.exceptions.NotEnoughMoneyToMakeTransferException;
+import com.example.demo.exceptions.TransferCantBeCanceledException;
 import com.example.demo.repositories.AccountRepository;
-import com.example.demo.repositories.ExternalTransferRepository;
 import com.example.demo.repositories.TransferRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-
+import java.util.List;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 public class TransferServiceImplTest {
@@ -37,10 +27,14 @@ public class TransferServiceImplTest {
     private Account accountToIsTransfer;
     private Account account, account2;
 
-    private Transfer transfer;
+    private Double moneyTransfer;
+
+    private Transfer transfer, transfer2, transfer3, transfer4, transfer5;
 
     @Before
     public void setup() {
+        moneyTransfer = 100.00;
+
         accountRepository = mock(AccountRepository.class);
         transferRepository = mock(TransferRepository.class);
 
@@ -61,29 +55,86 @@ public class TransferServiceImplTest {
                                        .build();
 
         account = Account.builder()
+                         .accountId(1)
                          .accountNumber("32345678901234567890123456")
-                         .money(200.00)
+                         .money(100.00)
                          .currency("EUR")
                          .ownerName("Owner3")
                          .isVisible(true)
                          .build();
 
+        account2 = Account.builder()
+                         .accountId(2)
+                         .accountNumber("42345678901234567890123456")
+                         .money(200.00)
+                         .currency("EUR")
+                         .ownerName("Owner4")
+                         .isVisible(true)
+                         .build();
 
-        transfer = new Transfer();
-        transfer.setSendingAccount(accountFromIsTransfer);
-        transfer.setTargetAccount(accountToIsTransfer);
-        transfer.setMoney(100);
-        transfer.setCurrency("EUR");
-        transfer.setTransferStatus("OPENED");
-        transfer.setDataOpenTransfer(LocalDateTime.now());
-        transfer.setDataFinishTransfer(null);
+       transfer = Transfer.builder()
+                          .transferId(1)
+                          .sendingAccount(accountFromIsTransfer)
+                          .targetAccount(accountToIsTransfer)
+                          .moneyBeforeConverting(moneyTransfer)
+                          .money(moneyTransfer)
+                          .currency(accountToIsTransfer.getCurrency())
+                          .dataOpenTransfer(LocalDateTime.now())
+                          .dataFinishTransfer(null)
+                          .transferStatus(TransferStatus.OPENED.getValue())
+                          .build();
+
+
+        transfer2 = Transfer.builder()
+                            .transferId(2)
+                            .sendingAccount(accountFromIsTransfer)
+                            .targetAccount(accountToIsTransfer)
+                            .moneyBeforeConverting(moneyTransfer)
+                            .money(moneyTransfer)
+                            .currency(accountToIsTransfer.getCurrency())
+                            .dataOpenTransfer(LocalDateTime.now())
+                            .dataFinishTransfer(null)
+                            .transferStatus(TransferStatus.OPENED.getValue())
+                            .build();
+
+        transfer3 = Transfer.builder()
+                            .sendingAccount(account2)
+                            .targetAccount(account)
+                            .moneyBeforeConverting(30.00)
+                            .money(30.00)
+                            .currency(account.getCurrency())
+                            .dataOpenTransfer(LocalDateTime.now())
+                            .dataFinishTransfer(null)
+                            .transferStatus(TransferStatus.OPENED.getValue())
+                            .build();
+
+        transfer4 = Transfer.builder()
+                .sendingAccount(account)
+                .targetAccount(account2)
+                .moneyBeforeConverting(40.00)
+                .money(40.00)
+                .currency(account2.getCurrency())
+                .dataOpenTransfer(LocalDateTime.now())
+                .dataFinishTransfer(null)
+                .transferStatus(TransferStatus.OPENED.getValue())
+                .build();
+
+        transfer5 = Transfer.builder()
+                .sendingAccount(account2)
+                .targetAccount(account)
+                .moneyBeforeConverting(50.00)
+                .money(50.00)
+                .currency(account.getCurrency())
+                .dataOpenTransfer(LocalDateTime.now())
+                .dataFinishTransfer(null)
+                .transferStatus(TransferStatus.OPENED.getValue())
+                .build();
 
         transferService = new TransferServiceImpl(accountRepository, transferRepository);
     }
 
     @Test(expected = NotEnoughMoneyToMakeTransferException.class)
     public void testShouldReturnNotEnoughMoneyToMakeTransferException() {
-
         when(accountRepository.findAccountByAccountNumber(accountFromIsTransfer.getAccountNumber())).thenReturn(accountFromIsTransfer);
         when(accountRepository.findAccountByAccountNumber(accountToIsTransfer.getAccountNumber())).thenReturn(accountToIsTransfer);
 
@@ -142,11 +193,67 @@ public class TransferServiceImplTest {
     }
 
     @Test
-    public void testShouldReturnThatMethodSaveWasCalledOnce() {
+    public void testShouldReturnListOf2() {
+        List<Transfer> transfers = new ArrayList<>();
+        transfers.add(transfer);
+        transfers.add(transfer2);
+
+        when(transferRepository.findAll()).thenReturn(transfers);
+
+        List<Transfer> transfersFound = transferService.getAllTransfers();
+
+        assertThat(transfersFound.size(), is(2));
+    }
+
+    @Test
+    public void testShouldReturnListFoundTransfersByIdOfSize3() {
+        List<Transfer> transfers = new ArrayList<>();
+        List<Transfer> transfers2 = new ArrayList<>();
+        transfers.add(transfer3);
+        transfers2.add(transfer4);
+        transfers2.add(transfer5);
+
+        when(transferRepository.findBySendingAccountAccountId(account.getAccountId())).thenReturn(transfers);
+        when(transferRepository.findByTargetAccountAccountId(account.getAccountId())).thenReturn(transfers2);
+
+        List<Transfer> transfersFound = transferService.getTransfersByAccountId(account.getAccountId());
+
+        assertThat(transfersFound.size(), is(3));
+    }
+
+    @Test
+    public void testShouldReturnTransfersWithChangedStatusToCancelled() {
+        when(transferRepository.findByTransferId(transfer.getTransferId())).thenReturn(transfer);
+        when(accountRepository.findAccountByAccountNumber(transfer.getSendingAccount().getAccountNumber())).thenReturn(accountFromIsTransfer);
+        transferService.cancelTransfer(transfer.getTransferId());
+
+        assertThat(transfer.getTransferStatus(), is("CANCELED"));
+    }
+
+    @Test
+    public void testShouldReturnTransfersWithChangedStatusToFinished() {
+        List<Transfer> transfersOpened = new ArrayList<>();
+        transfersOpened.add(transfer);
+        transfersOpened.add(transfer2);
+
+        when(accountRepository.findAccountByAccountNumber(transfer.getTargetAccount().getAccountNumber())).thenReturn(accountToIsTransfer);
+        when(accountRepository.findAccountByAccountNumber(transfer2.getTargetAccount().getAccountNumber())).thenReturn(accountToIsTransfer);
+        when(transferRepository.findByTransferId(transfersOpened.get(0).getTransferId())).thenReturn(transfersOpened.get(0));
+        when(transferRepository.findByTransferId(transfersOpened.get(1).getTransferId())).thenReturn(transfersOpened.get(1));
+        when(transferRepository.findByTransferStatus(TransferStatus.OPENED.getValue())).thenReturn(transfersOpened);
+
+        transferService.finishTransfers();
+
+        assertThat(transfer.getTransferStatus(), is("FINISHED"));
+        assertThat(transfer2.getTransferStatus(), is("FINISHED"));
+    }
+
+    @Test(expected = TransferCantBeCanceledException.class)
+    public void testShouldReturnTransferCantBeCanceledException() {
+        transfer.setTransferStatus(TransferStatus.FINISHED.getValue());
         when(transferRepository.findByTransferId(transfer.getTransferId())).thenReturn(transfer);
 
-
-        //verify(transferRepository, times(2)).findByTargetAccountAccountId(account.getAccountId());
+        transferService.cancelTransfer(transfer.getTransferId());
     }
 
 }
