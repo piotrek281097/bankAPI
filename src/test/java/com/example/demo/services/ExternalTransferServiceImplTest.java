@@ -6,18 +6,15 @@ import com.example.demo.repositories.AccountRepository;
 import com.example.demo.repositories.ExternalTransferRepository;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.math.BigDecimal;
-
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class ExternalTransferServiceImplTest {
 
-    private ExternalTransferService externalTransferService;
     private AccountRepository accountRepository;
-
+    private ExternalTransferService externalTransferService;
     private Account account;
     private ExternalTransfer externalTransfer;
     private String email;
@@ -55,6 +52,7 @@ public class ExternalTransferServiceImplTest {
     @Test
     public void testShouldReturnThatMoneyIsDeductedFromSendingAccount() {
         when(accountRepository.findAccountByAccountNumber(externalTransfer.getExternalAccount())).thenReturn(account);
+
         externalTransferService.makeExternalTransfer(externalTransfer, email);
 
         assertThat(account.getMoney(), is(180.00));
@@ -63,6 +61,7 @@ public class ExternalTransferServiceImplTest {
     @Test
     public void testShouldReturnThatMethodSaveWasCalledOnce() {
         when(accountRepository.findAccountByAccountNumber(externalTransfer.getExternalAccount())).thenReturn(account);
+
         externalTransferService.makeExternalTransfer(externalTransfer, email);
 
         verify(accountRepository, times(1)).save(account);

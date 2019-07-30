@@ -1,10 +1,11 @@
 package com.example.demo.DTOs;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ExternalAccountDto {
     private long id;
     private String number;

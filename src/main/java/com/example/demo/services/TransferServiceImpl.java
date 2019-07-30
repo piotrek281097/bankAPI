@@ -1,6 +1,5 @@
 package com.example.demo.services;
 
-import com.example.demo.DTOs.CurrencyDto;
 import com.example.demo.Utils.CheckingMethodsObject;
 import com.example.demo.Utils.MathematicalMethodsObject;
 import com.example.demo.enums.TransferStatus;
@@ -10,10 +9,7 @@ import com.example.demo.exceptions.*;
 import com.example.demo.repositories.AccountRepository;
 import com.example.demo.repositories.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -101,8 +97,6 @@ public class TransferServiceImpl implements TransferService {
     public List<Transfer> getTransfersInByAccountId(long accountId) {
         return transferRepository.findByTargetAccountAccountId(accountId);
     }
-
-
 
     public void finishTransfers() {
         List<Transfer> transfers = transferRepository.findByTransferStatus(TransferStatus.OPENED.getValue());

@@ -26,15 +26,15 @@ public class TransferServiceImplTest {
 
     private Account accountFromIsTransfer;
     private Account accountToIsTransfer;
-    private Account account, account2;
+    private Account account;
 
-    private Double moneyTransfer;
 
     private Transfer transfer, transfer2, transfer3, transfer4, transfer5;
 
     @Before
     public void setup() {
-        moneyTransfer = 100.00;
+        double moneyTransfer = 100.00;
+        Account account2;
 
         accountRepository = mock(AccountRepository.class);
         transferRepository = mock(TransferRepository.class);
@@ -110,26 +110,26 @@ public class TransferServiceImplTest {
                             .build();
 
         transfer4 = Transfer.builder()
-                .sendingAccount(account)
-                .targetAccount(account2)
-                .moneyBeforeConverting(40.00)
-                .money(40.00)
-                .currency(account2.getCurrency())
-                .dataOpenTransfer(LocalDateTime.now())
-                .dataFinishTransfer(null)
-                .transferStatus(TransferStatus.OPENED.getValue())
-                .build();
+                            .sendingAccount(account)
+                            .targetAccount(account2)
+                            .moneyBeforeConverting(40.00)
+                            .money(40.00)
+                            .currency(account2.getCurrency())
+                            .dataOpenTransfer(LocalDateTime.now())
+                            .dataFinishTransfer(null)
+                            .transferStatus(TransferStatus.OPENED.getValue())
+                            .build();
 
         transfer5 = Transfer.builder()
-                .sendingAccount(account2)
-                .targetAccount(account)
-                .moneyBeforeConverting(50.00)
-                .money(50.00)
-                .currency(account.getCurrency())
-                .dataOpenTransfer(LocalDateTime.now())
-                .dataFinishTransfer(null)
-                .transferStatus(TransferStatus.OPENED.getValue())
-                .build();
+                            .sendingAccount(account2)
+                            .targetAccount(account)
+                            .moneyBeforeConverting(50.00)
+                            .money(50.00)
+                            .currency(account.getCurrency())
+                            .dataOpenTransfer(LocalDateTime.now())
+                            .dataFinishTransfer(null)
+                            .transferStatus(TransferStatus.OPENED.getValue())
+                            .build();
 
         transferService = new TransferServiceImpl(accountRepository, transferRepository);
     }
@@ -155,7 +155,6 @@ public class TransferServiceImplTest {
 
     @Test
     public void testShouldReturnThatMoneyIsDeductedFromFirstAccount() {
-
         when(accountRepository.findAccountByAccountNumber(accountFromIsTransfer.getAccountNumber())).thenReturn(accountFromIsTransfer);
         when(accountRepository.findAccountByAccountNumber(accountToIsTransfer.getAccountNumber())).thenReturn(accountToIsTransfer);
 
@@ -167,6 +166,7 @@ public class TransferServiceImplTest {
     @Test
     public void testShouldReturnThatMethodFindBySendingAccountAccountIdWasCalledOnce() {
         when(transferRepository.findBySendingAccountAccountId(account.getAccountId())).thenReturn(new ArrayList<>());
+
         transferService.getTransfersOutByAccountId(account.getAccountId());
         transferService.getTransfersOutByAccountId(account.getAccountId());
 
@@ -176,6 +176,7 @@ public class TransferServiceImplTest {
     @Test
     public void testShouldReturnThatMethodFindByTargetAccountAccountIdWasCalledOnce() {
         when(transferRepository.findByTargetAccountAccountId(account.getAccountId())).thenReturn(new ArrayList<>());
+
         transferService.getTransfersInByAccountId(account.getAccountId());
 
         verify(transferRepository, times(1)).findByTargetAccountAccountId(account.getAccountId());
@@ -226,6 +227,7 @@ public class TransferServiceImplTest {
     public void testShouldReturnTransfersWithChangedStatusToCancelled() {
         when(transferRepository.findByTransferId(transfer.getTransferId())).thenReturn(transfer);
         when(accountRepository.findAccountByAccountNumber(transfer.getSendingAccount().getAccountNumber())).thenReturn(accountFromIsTransfer);
+
         transferService.cancelTransfer(transfer.getTransferId());
 
         assertThat(transfer.getTransferStatus(), is("CANCELED"));
@@ -252,6 +254,7 @@ public class TransferServiceImplTest {
     @Test(expected = TransferCantBeCanceledException.class)
     public void testShouldReturnTransferCantBeCanceledException() {
         transfer.setTransferStatus(TransferStatus.FINISHED.getValue());
+
         when(transferRepository.findByTransferId(transfer.getTransferId())).thenReturn(transfer);
 
         transferService.cancelTransfer(transfer.getTransferId());

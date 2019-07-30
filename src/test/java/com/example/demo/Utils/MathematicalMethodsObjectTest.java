@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.is;
 
 public class MathematicalMethodsObjectTest {
 
-
     @Test
     public void testShouldReturnRoundedValue() {
         Double expectedValue = 3.33;

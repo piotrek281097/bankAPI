@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import com.example.demo.DTOs.ExternalAccountDto;
 import com.example.demo.Utils.CheckingMethodsObject;
+import com.example.demo.Utils.MathematicalMethodsObject;
 import com.example.demo.entities.Account;
 import com.example.demo.exceptions.*;
 import com.example.demo.repositories.AccountRepository;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.client.RestTemplate;
 import javax.validation.ConstraintViolationException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +34,7 @@ public class AccountServiceImpl implements AccountService {
         } catch (AccountDoesNotExistException exc) {
             try {
                 CheckingMethodsObject.checkingIfCurrencyExists(account);
-                account.setMoney(roundValue(account.getMoney()));
+                account.setMoney(MathematicalMethodsObject.roundValue(account.getMoney()));
                 accountRepository.save(account);
             }
             catch (ConstraintViolationException | IllegalArgumentException ex) {
@@ -60,7 +60,7 @@ public class AccountServiceImpl implements AccountService {
         CheckingMethodsObject.checkingIfAccountExists(account);
         CheckingMethodsObject.checkingIfCurrencyExists(account);
 
-        accountToSave.setMoney(roundValue(account.getMoney()));
+        accountToSave.setMoney(MathematicalMethodsObject.roundValue(account.getMoney()));
         accountToSave.setCurrency(account.getCurrency());
         accountToSave.setOwnerName(account.getOwnerName());
 
@@ -122,12 +122,5 @@ public class AccountServiceImpl implements AccountService {
         CheckingMethodsObject.checkingIfAccountsFoundByNameExist(accountsFoundByName);
 
         return accountsFoundByName;
-    }
-
-    private static double roundValue(Double value) {
-        String newValue = new DecimalFormat("##.##").format(value);
-        newValue = newValue.replace(",", ".");
-
-        return Double.parseDouble(newValue);
     }
 }

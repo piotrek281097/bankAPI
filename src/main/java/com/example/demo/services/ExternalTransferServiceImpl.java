@@ -41,6 +41,7 @@ public class ExternalTransferServiceImpl implements ExternalTransferService {
                 externalTransfer.setCurrency(myAccount.getCurrency());
 
                 CheckingMethodsObject.checkingIfThereIsEnoughMoneyToMakeTransfer(myAccount, externalTransfer.getAmount().doubleValue());
+
                 myAccount.setMoney(myAccount.getMoney() - externalTransfer.getAmount().doubleValue());
 
                 accountRepository.save(myAccount);
