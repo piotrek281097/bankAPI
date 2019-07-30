@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.Utils.MathematicalMethodsObject;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.Transfer;
 import com.example.demo.enums.TransferStatus;
@@ -77,7 +78,7 @@ public class TransferServiceImplTest {
                           .sendingAccount(accountFromIsTransfer)
                           .targetAccount(accountToIsTransfer)
                           .moneyBeforeConverting(moneyTransfer)
-                          .money(moneyTransfer)
+                          .money(MathematicalMethodsObject.convertCurrencies(accountFromIsTransfer.getCurrency(), accountToIsTransfer.getCurrency(), moneyTransfer))
                           .currency(accountToIsTransfer.getCurrency())
                           .dataOpenTransfer(LocalDateTime.now())
                           .dataFinishTransfer(null)
@@ -90,7 +91,7 @@ public class TransferServiceImplTest {
                             .sendingAccount(accountFromIsTransfer)
                             .targetAccount(accountToIsTransfer)
                             .moneyBeforeConverting(moneyTransfer)
-                            .money(moneyTransfer)
+                            .money(MathematicalMethodsObject.convertCurrencies(accountFromIsTransfer.getCurrency(), accountToIsTransfer.getCurrency(), moneyTransfer))
                             .currency(accountToIsTransfer.getCurrency())
                             .dataOpenTransfer(LocalDateTime.now())
                             .dataFinishTransfer(null)
@@ -254,6 +255,21 @@ public class TransferServiceImplTest {
         when(transferRepository.findByTransferId(transfer.getTransferId())).thenReturn(transfer);
 
         transferService.cancelTransfer(transfer.getTransferId());
+    }
+
+    @Test(expected = AccountAlreadyDeletedException.class)
+    public void testShouldReturnAccountAlreadyDeletedException() {
+        List<Transfer> transfersOpened = new ArrayList<>();
+        transfersOpened.add(transfer);
+
+        accountToIsTransfer.setVisible(false);
+
+        when(transferRepository.findByTransferStatus(TransferStatus.OPENED.getValue())).thenReturn(transfersOpened);
+        when(accountRepository.findAccountByAccountNumber(transfer.getTargetAccount().getAccountNumber())).thenReturn(accountToIsTransfer);
+        when(transferRepository.findByTransferId(transfersOpened.get(0).getTransferId())).thenReturn(transfersOpened.get(0));
+        when(accountRepository.findAccountByAccountNumber(transfer.getSendingAccount().getAccountNumber())).thenReturn(accountFromIsTransfer);
+
+        transferService.finishTransfers();
     }
 
 }

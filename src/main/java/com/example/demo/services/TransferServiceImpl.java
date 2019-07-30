@@ -43,13 +43,8 @@ public class TransferServiceImpl implements TransferService {
 
             CheckingMethodsObject.checkingIfAccountsExist(firstAccount, secondAccount);
 
-            if (firstAccount.getCurrency().equals(secondAccount.getCurrency())) {
-                newMoneyAmountToFirstAccount = firstAccount.getMoney() - valueOfTransfer;
-                moneyTransferAmountTo = valueOfTransfer;
-            } else {
-                moneyTransferAmountTo = convertCurrencies(firstAccount.getCurrency(), secondAccount.getCurrency(), valueOfTransfer);
-                newMoneyAmountToFirstAccount = firstAccount.getMoney() - valueOfTransfer;
-            }
+            moneyTransferAmountTo = MathematicalMethodsObject.convertCurrencies(firstAccount.getCurrency(), secondAccount.getCurrency(), valueOfTransfer);
+            newMoneyAmountToFirstAccount = firstAccount.getMoney() - valueOfTransfer;
 
             CheckingMethodsObject.checkingIfThereIsEnoughMoneyToMakeTransfer(newMoneyAmountToFirstAccount);
             firstAccount.setMoney(newMoneyAmountToFirstAccount);
@@ -69,7 +64,6 @@ public class TransferServiceImpl implements TransferService {
                                            .dataFinishTransfer(null)
                                            .transferStatus(TransferStatus.OPENED.getValue())
                                            .build();
-
 
             addTransfer(newTransfer);
 
@@ -108,20 +102,7 @@ public class TransferServiceImpl implements TransferService {
         return transferRepository.findByTargetAccountAccountId(accountId);
     }
 
-    private Double convertCurrencies(String currency1, String currency2, Double valueOfTransfer) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "https://api.exchangeratesapi.io/latest?base=" + currency1;
-            ResponseEntity<CurrencyDto> response = restTemplate.getForEntity(url, CurrencyDto.class);
-            CurrencyDto currencyDto = response.getBody();
 
-            return MathematicalMethodsObject.roundValue(valueOfTransfer * currencyDto.getRates().get(currency2));
-        } catch (NullPointerException ex) {
-            throw new CurrencyIsNotAvailableException("Blad w konwersji walut");
-        } catch (ResourceAccessException ex) {
-            throw new ConnectionException("Blad w polaczeniu z API");
-        }
-    }
 
     public void finishTransfers() {
         List<Transfer> transfers = transferRepository.findByTransferStatus(TransferStatus.OPENED.getValue());
