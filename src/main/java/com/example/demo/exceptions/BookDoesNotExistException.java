@@ -3,11 +3,10 @@ package com.example.demo.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(code = HttpStatus.CONFLICT)
-public class WrongDataException extends RuntimeException {
+@ResponseStatus(code = HttpStatus.NOT_FOUND)
+public class BookDoesNotExistException extends RuntimeException {
 
-    public WrongDataException(String message) {
+    public BookDoesNotExistException(String message) {
         super(message);
     }
-
 }
